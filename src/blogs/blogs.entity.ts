@@ -1,11 +1,20 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
+import { Matches } from 'class-validator';
 
-export type BlogInputDto = {
+import { IsStringWithTrim } from '../users/users.trash';
+
+export class BlogInputDto {
+  @IsStringWithTrim(1, 15)
   name: string;
+  @IsStringWithTrim(1, 500)
   description: string;
+  @IsStringWithTrim(1, 100)
+  @Matches(
+    /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/,
+  )
   websiteUrl: string;
-};
+}
 
 @Schema({ versionKey: false })
 export class BlogModel {

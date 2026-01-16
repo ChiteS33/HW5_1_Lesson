@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import {
   CommentDocument,
   CommentModel,
@@ -16,6 +16,8 @@ import {
   finalCommentsMapperWithPago,
 } from './comments.trash';
 import { paginationValuesMaker } from '../posts/posts.trash';
+import { DomainException } from '../core/exceptions/domain-exceptions';
+import { DomainExceptionCode } from '../core/exceptions/domain-exception-codes';
 
 @Injectable()
 export class CommentsQueryRepository {
@@ -34,7 +36,13 @@ export class CommentsQueryRepository {
     pagination: InputPaginationType,
   ): Promise<FinalWithPaginationType<CommentOutPutType>> {
     const foundedPost = await this.postsRepository.findPostsById(postId);
-    if (!foundedPost) throw new NotFoundException();
+    if (!foundedPost) {
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        field: 'postId',
+        message: 'Post not found',
+      });
+    }
 
     const paginationValues = paginationValuesMaker(pagination);
     const search = { postId: postId };

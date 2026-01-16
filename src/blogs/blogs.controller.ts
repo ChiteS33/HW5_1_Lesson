@@ -41,7 +41,7 @@ export class BlogsController {
   async getAllBlogs(
     @Query() query: InputPaginationWithSearchName,
   ): Promise<FinalWithPaginationType<BlogOutPutType>> {
-    return this.blogsQueryRepository.getAllBlogs(query);
+    return await this.blogsQueryRepository.getAllBlogs(query);
   }
 
   @HttpCode(HttpStatus.CREATED)

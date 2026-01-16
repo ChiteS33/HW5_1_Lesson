@@ -4,10 +4,11 @@ import {
   HttpCode,
   HttpStatus,
   Inject,
-  NotFoundException,
   Param,
 } from '@nestjs/common';
 import { CommentsQueryRepository } from './comments.queryRepository';
+import { DomainException } from '../core/exceptions/domain-exceptions';
+import { DomainExceptionCode } from '../core/exceptions/domain-exception-codes';
 
 @Controller('comments')
 export class CommentsController {
@@ -21,7 +22,13 @@ export class CommentsController {
   async getCommentById(@Param('id') commentId: string) {
     const foundedComment =
       await this.commentsQueryRepository.getCommentById(commentId);
-    if (!foundedComment) throw new NotFoundException();
+    if (!foundedComment) {
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        field: 'commentId',
+        message: 'Could not find comment',
+      });
+    }
     return foundedComment;
   }
 }

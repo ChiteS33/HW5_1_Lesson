@@ -16,10 +16,6 @@ export class PostsRepository {
     return this.postModel.findById(postId);
   }
 
-  async findPostsByBlogId(blogId: string): Promise<PostDocument[] | null> {
-    return this.postModel.find({ blogId });
-  }
-
   async deletePostById(postId: string): Promise<void> {
     await this.postModel.deleteOne({ _id: postId });
     return;

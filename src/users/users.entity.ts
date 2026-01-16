@@ -1,5 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
+import { add } from 'date-fns';
+import { Matches } from 'class-validator';
+import { IsStringWithTrim } from './users.trash';
 
 export type UserDocument = HydratedDocument<UserModel>;
 
@@ -9,11 +12,16 @@ export type UserInputDtoForCreate = {
   passwordHash: string;
 };
 
-export type UserInputDto = {
+export class UserInputDto {
+  @IsStringWithTrim(3, 10)
+  @Matches(/^[a-zA-Z0-9_-]*$/)
   login: string;
+  @IsStringWithTrim(6, 20)
   password: string;
+  @IsStringWithTrim(1, 100)
+  @Matches(/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/)
   email: string;
-};
+}
 
 @Schema()
 export class EmailConfirmation {
@@ -39,22 +47,56 @@ export class UserModel {
   emailConfirmation: EmailConfirmation;
   @Prop({ _id: false, type: RecoveryData }) recoveryData: RecoveryData;
 
-  public static createUserByAdmin(dto: UserInputDtoForCreate): UserModel {
+  public static createUserByAdmin(body: UserInputDtoForCreate): UserModel {
     const emailConf = {
       confirmationCode: null,
       expirationDate: new Date(),
       isConfirmed: true,
     };
     const newUser = new UserModel();
-    newUser.login = dto.login;
-    newUser.email = dto.email;
-    newUser.passwordHash = dto.passwordHash;
+    newUser.login = body.login;
+    newUser.email = body.email;
+    newUser.passwordHash = body.passwordHash;
     newUser.createdAt = new Date();
     newUser.emailConfirmation = emailConf;
     newUser.recoveryData = {
       recoveryCode: null,
     };
     return newUser;
+  }
+
+  public static createUser(
+    body: UserInputDto,
+    passwordHash: string,
+  ): UserModel {
+    const emailConf = {
+      confirmationCode: crypto.randomUUID(),
+      expirationDate: add(new Date(), { hours: 1 }),
+      isConfirmed: false,
+    };
+    const newUser = new UserModel();
+    newUser.login = body.login;
+    newUser.email = body.email;
+    newUser.passwordHash = passwordHash;
+    newUser.createdAt = new Date();
+    newUser.emailConfirmation = emailConf;
+    newUser.recoveryData = {
+      recoveryCode: null,
+    };
+    return newUser;
+  }
+  changeConfirmationStatus(status: boolean) {
+    this.emailConfirmation.isConfirmed = status;
+    return;
+  }
+  recoveryCode() {
+    this.recoveryData.recoveryCode = crypto.randomUUID();
+    return;
+  }
+  refreshConfirmationCode() {
+    this.emailConfirmation.confirmationCode = crypto.randomUUID();
+    this.emailConfirmation.expirationDate = add(new Date(), { hours: 1 });
+    return;
   }
 }
 

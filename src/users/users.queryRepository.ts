@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UserDocument, UserModel, UserModelI } from './users.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import {
@@ -11,6 +11,8 @@ import {
   outPutPaginationUserMapper,
   valuesMakerWithSearchLoginAndEmail,
 } from './users.trash';
+import { DomainException } from '../core/exceptions/domain-exceptions';
+import { DomainExceptionCode } from '../core/exceptions/domain-exception-codes';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -50,7 +52,13 @@ export class UsersQueryRepository {
 
   async findUserByUserId(userId: string): Promise<UserOutPut> {
     const foundedUser = await this.userModel.findOne({ _id: userId });
-    if (!foundedUser) throw new NotFoundException();
+    if (!foundedUser) {
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        field: 'userId',
+        message: 'User not found',
+      });
+    }
     return outPutUserMapper(foundedUser);
   }
 }

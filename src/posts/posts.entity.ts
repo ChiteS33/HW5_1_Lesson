@@ -1,20 +1,28 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
+import { IsStringWithTrim } from '../users/users.trash';
 
 export type PostDocument = HydratedDocument<PostModel>;
 
-export type PostInputDto = {
+export class PostInputDto {
+  @IsStringWithTrim(1, 30)
   title: string;
+  @IsStringWithTrim(1, 100)
   shortDescription: string;
+  @IsStringWithTrim(1, 1000)
   content: string;
-};
+}
 
-export type PostInputDtoForCreate = {
+export class PostInputDtoForCreate {
+  @IsStringWithTrim(1, 30)
   title: string;
+  @IsStringWithTrim(1, 100)
   shortDescription: string;
+  @IsStringWithTrim(1, 1000)
   content: string;
+  @IsStringWithTrim(1, 100)
   blogId: string;
-};
+}
 
 export enum MyStatus {
   none = 'None',
@@ -67,7 +75,6 @@ export class PostModel {
     newPost.blogName = blogName;
     newPost.createdAt = new Date();
     newPost.extendedLikesInfo = extendedLikes;
-    console.log(newPost);
     return newPost;
   }
 

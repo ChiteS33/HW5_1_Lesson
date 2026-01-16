@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BlogDocument, BlogModel, BlogModelI } from './blogs.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import {
@@ -10,6 +10,8 @@ import {
   OutPutPaginationType,
   paginationValuesMakerWithSearch,
 } from './blogs.trash';
+import { DomainException } from '../core/exceptions/domain-exceptions';
+import { DomainExceptionCode } from '../core/exceptions/domain-exception-codes';
 
 @Injectable()
 export class BlogsQueryRepository {
@@ -51,7 +53,13 @@ export class BlogsQueryRepository {
 
   async getBlogById(blogId: string): Promise<BlogOutPutType> {
     const foundBlog = await this.blogsModel.findOne({ _id: blogId });
-    if (!foundBlog) throw new NotFoundException();
+    if (!foundBlog) {
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        field: 'blogId',
+        message: 'Blog not found.',
+      });
+    }
     return blogMapper(foundBlog);
   }
 }

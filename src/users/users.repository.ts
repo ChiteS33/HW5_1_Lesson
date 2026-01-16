@@ -24,4 +24,32 @@ export class UsersRepository {
     await this.UserModel.deleteOne({ _id: userId });
     return;
   }
+  async findUserByLoginOrEmail(
+    loginOrEmail: string,
+  ): Promise<UserDocument | null> {
+    return this.UserModel.findOne({
+      $or: [{ email: loginOrEmail }, { login: loginOrEmail }],
+    });
+  }
+
+  async findUserByConfirmationCode(code: string): Promise<UserDocument | null> {
+    return this.UserModel.findOne({
+      'emailConfirmation.confirmationCode': code,
+    });
+  }
+
+  async findUserByRecoveryCode(
+    recoveryCode: string,
+  ): Promise<UserDocument | null> {
+    return this.UserModel.findOne({
+      'recoveryData.recoveryCode': recoveryCode,
+    });
+  }
+
+  async findUserByEmail(email: string): Promise<UserDocument | null> {
+    return this.UserModel.findOne({ email: email });
+  }
+  async findUserByLogin(login: string): Promise<UserDocument | null> {
+    return this.UserModel.findOne({ login: login });
+  }
 }

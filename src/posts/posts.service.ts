@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import {
   PostDocument,
   PostInputDto,
@@ -9,6 +9,8 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { PostsRepository } from './posts.repository';
 import { BlogsRepository } from '../blogs/blogs.repository';
+import { DomainException } from '../core/exceptions/domain-exceptions';
+import { DomainExceptionCode } from '../core/exceptions/domain-exception-codes';
 
 @Injectable()
 export class PostService {
@@ -22,14 +24,26 @@ export class PostService {
     const foundBlog = await this.blogsRepository.findBlogByBlogId(
       inputDto.blogId,
     );
-    if (!foundBlog) throw new NotFoundException();
+    if (!foundBlog) {
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        field: 'blogId',
+        message: 'Blog not found.',
+      });
+    }
     const newPost = PostModel.createPost(inputDto, foundBlog.name);
     return this.postsRepository.save(newPost);
   }
 
   async findPostById(postId: string): Promise<PostDocument> {
     const foundedPost = await this.postsRepository.findPostsById(postId);
-    if (!foundedPost) throw new NotFoundException();
+    if (!foundedPost) {
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        field: 'postId',
+        message: 'Post not found.',
+      });
+    }
     return foundedPost;
   }
 
@@ -38,7 +52,13 @@ export class PostService {
     postInputDto: PostInputDto,
   ): Promise<string> {
     const foundBlog = await this.blogsRepository.findBlogByBlogId(blogId);
-    if (!foundBlog) throw new NotFoundException();
+    if (!foundBlog) {
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        field: 'blogId',
+        message: 'Blog not found.',
+      });
+    }
     const createdPost = PostModel.createPost(
       { ...postInputDto, blogId },
       foundBlog.name,

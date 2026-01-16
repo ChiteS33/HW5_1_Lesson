@@ -21,9 +21,28 @@ import { CommentsController } from './comments/comments.controller';
 import { CommentsQueryRepository } from './comments/comments.queryRepository';
 import { CommentsService } from './comments/comments.service';
 import { CommentsRepository } from './comments/comments.repository';
+import { LocalStrategy } from './Auth/strategies/local.strategy';
+import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConstants } from './Auth/strategies/constants';
+import { AuthService } from './Auth/auth.service';
+import { AuthController } from './Auth/auth.controller';
+import { JwtStrategy } from './Auth/strategies/jwt.strategy';
+import { BasicStrategy } from './Auth/strategies/basic.strategy';
+import { EmailAdapter } from './Auth/emailAdapter/email-adapter';
+import { BcryptService } from './Auth/bcryptAdapter/bcrypt.service';
+
+import { APP_FILTER } from '@nestjs/core';
+import { AllHttpExceptionsFilter } from './core/exceptions/filters/all-exceptions.filter';
+import { DomainHttpExceptionsFilter } from './core/exceptions/filters/domain-exceptions.filter';
 
 @Module({
   imports: [
+    PassportModule,
+    JwtModule.register({
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '1h' },
+    }),
     MongooseModule.forRoot('mongodb://localhost:27017/Grecha'),
     MongooseModule.forFeature([
       {
@@ -50,6 +69,7 @@ import { CommentsRepository } from './comments/comments.repository';
     BlogsController,
     PostsController,
     CommentsController,
+    AuthController,
   ],
   providers: [
     UsersService,
@@ -64,6 +84,20 @@ import { CommentsRepository } from './comments/comments.repository';
     CommentsService,
     CommentsRepository,
     CommentsQueryRepository,
+    LocalStrategy,
+    BasicStrategy,
+    JwtStrategy,
+    BcryptService,
+    AuthService,
+    EmailAdapter,
+    {
+      provide: APP_FILTER,
+      useClass: AllHttpExceptionsFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: DomainHttpExceptionsFilter,
+    },
   ],
 })
 export class AppModule {}

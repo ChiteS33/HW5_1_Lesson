@@ -6,7 +6,6 @@ import {
   HttpCode,
   HttpStatus,
   Inject,
-  NotFoundException,
   Param,
   Post,
   Put,
@@ -17,6 +16,8 @@ import { PostInputDtoForCreate } from './posts.entity';
 import { PostService } from './posts.service';
 import { CommentsQueryRepository } from '../comments/comments.queryRepository';
 import { InputPaginationType } from '../blogs/blogs.trash';
+import { DomainException } from '../core/exceptions/domain-exceptions';
+import { DomainExceptionCode } from '../core/exceptions/domain-exception-codes';
 
 @Controller('posts')
 export class PostsController {
@@ -59,7 +60,13 @@ export class PostsController {
   async getPostById(@Param('id') postId: string) {
     const foundedPost =
       await this.postsQueryRepository.findPostByPostId(postId);
-    if (!foundedPost) throw new NotFoundException();
+    if (!foundedPost) {
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        field: 'postId',
+        message: 'Post not found',
+      });
+    }
     return foundedPost;
   }
 

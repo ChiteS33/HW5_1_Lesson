@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { PostModel, PostModelI } from './posts.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import {
@@ -13,6 +13,8 @@ import {
   PostOutPutType,
 } from './posts.trash';
 import { BlogsService } from '../blogs/blogs.service';
+import { DomainException } from '../core/exceptions/domain-exceptions';
+import { DomainExceptionCode } from '../core/exceptions/domain-exception-codes';
 
 @Injectable()
 export class PostsQueryRepository {
@@ -49,7 +51,13 @@ export class PostsQueryRepository {
   }
   async findPostByPostId(postId: string): Promise<PostOutPutType> {
     const foundedPost = await this.postModel.findById({ _id: postId });
-    if (!foundedPost) throw new NotFoundException();
+    if (!foundedPost) {
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        field: 'postId',
+        message: 'Post not found',
+      });
+    }
     return postMapper(foundedPost);
   }
   async findAllPostsByBlogId(

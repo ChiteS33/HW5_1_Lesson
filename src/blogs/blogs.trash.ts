@@ -1,4 +1,5 @@
 import { BlogDocument } from './blogs.entity';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export const paginationValuesMakerWithSearch = (
   query: InputPaginationWithSearchName,
@@ -13,21 +14,43 @@ export const paginationValuesMakerWithSearch = (
     pageSize: query.pageSize ? Number(query.pageSize) : 10,
   };
 };
+export enum SortDirection {
+  ASC = 'asc',
+  DESC = 'desc',
+}
 
-export type InputPaginationType = {
+export class InputPaginationType {
+  @IsOptional()
+  @IsString()
   pageNumber?: string;
+  @IsOptional()
+  @IsNumber()
   pageSize?: string;
+  @IsOptional()
+  @IsString()
   sortBy?: string;
+  @IsOptional()
+  @IsEnum(SortDirection)
   sortDirection?: SortDirection;
-};
+}
 
-export type InputPaginationWithSearchName = {
+export class InputPaginationWithSearchName {
+  @IsOptional()
+  @IsOptional()
   searchNameTerm?: string;
+  @IsOptional()
+  @IsString()
   sortBy?: string;
+  @IsOptional()
+  @IsEnum(SortDirection)
   sortDirection?: SortDirection;
+  @IsOptional()
+  @IsString()
   pageNumber?: string;
+  @IsOptional()
+  @IsString()
   pageSize?: string;
-};
+}
 
 export type PaginationForRepoWithSearchName = {
   searchNameTerm: string | null;
@@ -36,11 +59,6 @@ export type PaginationForRepoWithSearchName = {
   pageNumber: number;
   pageSize: number;
 };
-
-export enum SortDirection {
-  ASC = 'asc',
-  DESC = 'desc',
-}
 
 export type BlogOutPutType = {
   id: string;
