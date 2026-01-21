@@ -1,8 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { Matches } from 'class-validator';
-
-import { IsStringWithTrim } from '../users/users.trash';
+import { IsStringWithTrim } from '../core/decorators/validation/is-string-with-trim';
 
 export class BlogInputDto {
   @IsStringWithTrim(1, 15)

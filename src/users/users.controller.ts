@@ -11,18 +11,20 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { UsersQueryRepository } from './users.queryRepository';
+import { UsersQueryRepository } from './repositories/users.queryRepository';
 import { UserInputDto } from './users.entity';
 import { InPutPaginationWithSearchLoginTermAndSearchEMailTerm } from './users.trash';
-import { BasicAuthGuard } from '../Auth/guards/basic-auth-guard.service';
+import { CreateUserCommand } from './user-use-cases/create-user-use-case';
+import { CommandBus } from '@nestjs/cqrs';
+import { DeleteUserCommand } from './user-use-cases/delete-user-use-case';
+import { BasicAuthGuard } from '../core/guards/basic-auth-guard.service';
 
 @Controller(`users`)
 export class UsersController {
   constructor(
+    private commandBus: CommandBus,
     @Inject(UsersQueryRepository)
     private usersQueryRepository: UsersQueryRepository,
-    @Inject(UsersService) private usersService: UsersService,
   ) {}
 
   @UseGuards(BasicAuthGuard)
@@ -38,7 +40,11 @@ export class UsersController {
   @HttpCode(HttpStatus.CREATED)
   @Post()
   async createUser(@Body() userInputDto: UserInputDto) {
-    const createdUserId = await this.usersService.createUser(userInputDto);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const createdUserId = await this.commandBus.execute(
+      new CreateUserCommand(userInputDto),
+    );
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return this.usersQueryRepository.findUserByUserId(createdUserId);
   }
 
@@ -46,6 +52,7 @@ export class UsersController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(`:id`)
   async deleteUser(@Param('id') userId: string) {
-    return this.usersService.deleteUser(userId);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return this.commandBus.execute(new DeleteUserCommand(userId));
   }
 }

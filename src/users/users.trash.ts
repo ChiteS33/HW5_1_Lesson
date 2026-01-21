@@ -1,18 +1,10 @@
 import {
   FinalWithPaginationType,
   OutPutPaginationType,
-  SortDirection,
 } from '../blogs/blogs.trash';
-import { UserOutPut } from './users.queryRepository';
-import { IsEnum, IsOptional, IsString, Length } from 'class-validator';
-import { applyDecorators } from '@nestjs/common';
-import { Transform, TransformFnParams } from 'class-transformer';
-
-
-export const Trim = () =>
-  Transform(({ value }: TransformFnParams) =>
-    typeof value === 'string' ? value.trim() : value,
-  );
+import { UserOutPut } from './repositories/users.queryRepository';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { SortDirection } from '../core/dto/base.query-params.input-dto';
 
 export class InPutPaginationWithSearchLoginTermAndSearchEMailTerm {
   @IsOptional()
@@ -69,8 +61,3 @@ export const outPutPaginationUserMapper = (
     items: dto,
   };
 };
-
-
-
-export const IsStringWithTrim = (minLength: number, maxLength: number) =>
-  applyDecorators(IsString(), Length(minLength, maxLength), Trim());

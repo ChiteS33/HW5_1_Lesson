@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
-import { IsStringWithTrim } from '../users/users.trash';
+import { IsStringWithTrim } from '../core/decorators/validation/is-string-with-trim';
 
 export type PostDocument = HydratedDocument<PostModel>;
 

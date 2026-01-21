@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { add } from 'date-fns';
 import { Matches } from 'class-validator';
-import { IsStringWithTrim } from './users.trash';
+import { IsStringWithTrim } from '../core/decorators/validation/is-string-with-trim';
 
 export type UserDocument = HydratedDocument<UserModel>;
 

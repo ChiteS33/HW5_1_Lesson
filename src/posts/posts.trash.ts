@@ -1,12 +1,27 @@
 import {
   FinalWithPaginationType,
-  InputPaginationType,
   OutPutPaginationType,
-  SortDirection,
 } from '../blogs/blogs.trash';
 import { PostDocument } from './posts.entity';
 import { mockLikeInfo } from '../comments/comments.trash';
 import { LikesInfo } from '../comments/comments.entity';
+import {
+  InputPaginationType,
+  SortDirection,
+} from '../core/dto/base.query-params.input-dto';
+
+export type InputDtoForCreateComment = {
+  postId: string;
+  content: string;
+  userId: string;
+  userLogin: string;
+};
+
+export type InputDtoForUpdateComment = {
+  commentId: string;
+  content: string;
+  userId: string;
+};
 
 export type PostOutPutType = {
   id: string;

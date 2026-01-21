@@ -1,5 +1,6 @@
 import { BlogDocument } from './blogs.entity';
-import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { SortDirection } from '../core/dto/base.query-params.input-dto';
 
 export const paginationValuesMakerWithSearch = (
   query: InputPaginationWithSearchName,
@@ -14,25 +15,6 @@ export const paginationValuesMakerWithSearch = (
     pageSize: query.pageSize ? Number(query.pageSize) : 10,
   };
 };
-export enum SortDirection {
-  ASC = 'asc',
-  DESC = 'desc',
-}
-
-export class InputPaginationType {
-  @IsOptional()
-  @IsString()
-  pageNumber?: string;
-  @IsOptional()
-  @IsNumber()
-  pageSize?: string;
-  @IsOptional()
-  @IsString()
-  sortBy?: string;
-  @IsOptional()
-  @IsEnum(SortDirection)
-  sortDirection?: SortDirection;
-}
 
 export class InputPaginationWithSearchName {
   @IsOptional()

@@ -1,15 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { UsersRepository } from './users.repository';
-import {
-  UserDocument,
-  UserInputDto,
-  UserModel,
-  UserModelI,
-} from './users.entity';
-import { BcryptService } from '../Auth/bcryptAdapter/bcrypt.service';
+import { UsersRepository } from './repositories/users.repository';
+import { UserDocument, UserModel, UserModelI } from './users.entity';
 import { DomainException } from '../core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '../core/exceptions/domain-exception-codes';
+import { BcryptService } from '../core/adapters/bcryptAdapter/bcrypt.service';
 
 @Injectable()
 export class UsersService {
@@ -32,42 +27,42 @@ export class UsersService {
     return foundedUser;
   }
 
-  async createUser(inputDto: UserInputDto): Promise<string> {
-    const foundedUserByLogin = await this.usersRepository.findUserByLogin(
-      inputDto.login,
-    );
-    if (foundedUserByLogin)
-      throw new DomainException({
-        code: DomainExceptionCode.Unauthorized,
-        field: 'login',
-        message: 'Login now is using',
-      });
-    const foundedUserByEmail = await this.usersRepository.findUserByEmail(
-      inputDto.email,
-    );
-    if (foundedUserByEmail) {
-      throw new DomainException({
-        code: DomainExceptionCode.BadRequest,
-        field: 'email',
-        message: 'Email already in use',
-      });
-    }
-    const hash = await this.bcryptService.hashMake(inputDto.password);
+  // async createUser(inputDto: UserInputDto): Promise<string> {
+  //   const foundedUserByLogin = await this.usersRepository.findUserByLogin(
+  //     inputDto.login,
+  //   );
+  //   if (foundedUserByLogin)
+  //     throw new DomainException({
+  //       code: DomainExceptionCode.Unauthorized,
+  //       field: 'login',
+  //       message: 'Login now is using',
+  //     });
+  //   const foundedUserByEmail = await this.usersRepository.findUserByEmail(
+  //     inputDto.email,
+  //   );
+  //   if (foundedUserByEmail) {
+  //     throw new DomainException({
+  //       code: DomainExceptionCode.BadRequest,
+  //       field: 'email',
+  //       message: 'Email already in use',
+  //     });
+  //   }
+  //   const hash = await this.bcryptService.hashMake(inputDto.password);
+  //
+  //   const createDto = {
+  //     login: inputDto.login,
+  //     email: inputDto.email,
+  //     passwordHash: hash,
+  //   };
+  //   const createdUser = this.userModel.createUserByAdmin(createDto);
+  //   return await this.usersRepository.save(createdUser);
+  // }
 
-    const createDto = {
-      login: inputDto.login,
-      email: inputDto.email,
-      passwordHash: hash,
-    };
-    const createdUser = this.userModel.createUserByAdmin(createDto);
-    return await this.usersRepository.save(createdUser);
-  }
-
-  async deleteUser(userId: string): Promise<void> {
-    await this.findUserById(userId);
-    await this.usersRepository.deleteUserById(userId);
-    return;
-  }
+  // async deleteUser(userId: string): Promise<void> {
+  //   await this.findUserById(userId);
+  //   await this.usersRepository.deleteUserById(userId);
+  //   return;
+  // }
 
   async findUserByLoginOrEmail(loginOrEmail: string): Promise<UserDocument> {
     const foundedUser =
@@ -82,7 +77,7 @@ export class UsersService {
     return foundedUser;
   }
 
-  async findUserForCreatUser(login: string): Promise<void> {
+  async findUserByLogin(login: string): Promise<void> {
     const foundedUser =
       await this.usersRepository.findUserByLoginOrEmail(login);
     if (foundedUser)

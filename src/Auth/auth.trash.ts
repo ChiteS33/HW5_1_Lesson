@@ -1,5 +1,5 @@
-import { IsStringWithTrim } from '../users/users.trash';
 import { Matches } from 'class-validator';
+import { IsStringWithTrim } from '../core/decorators/validation/is-string-with-trim';
 
 export class BodyInputDto {
   @IsStringWithTrim(1, 200)
