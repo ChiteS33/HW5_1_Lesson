@@ -1,17 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { BlogDocument, BlogModel, BlogModelI } from '../blogs.entity';
 import { InjectModel } from '@nestjs/mongoose';
-import {
-  blogMapper,
-  BlogOutPutType,
-  finalPaginationWithBlogValue,
-  FinalWithPaginationType,
-  OutPutPaginationType,
-  paginationValuesMakerWithSearch,
-} from '../blogs.trash';
 import { DomainException } from '../../core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '../../core/exceptions/domain-exception-codes';
 import { InputPaginationType } from '../../core/dto/base.query-params.input-dto';
+import {
+  BlogOutPutType,
+  FinalWithPaginationType,
+  OutPutPaginationType,
+} from '../types/blog.types';
+import {
+  blogMapper,
+  finalPaginationWithBlogValue,
+} from '../mappers/blog.mappers';
+import { paginationValuesMakerWithSearch } from '../../common/mappers/common.mappers';
 
 @Injectable()
 export class BlogsQueryRepository {

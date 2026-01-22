@@ -18,7 +18,10 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     loginOrEmail: string,
     password: string,
   ): Promise<UserDocument> {
-    const user = await this.authService.validateUser(loginOrEmail, password);
+    const user = await this.authService.checkingUser({
+      loginOrEmail,
+      password,
+    });
     if (!user) {
       throw new DomainException({
         code: DomainExceptionCode.NotFound,

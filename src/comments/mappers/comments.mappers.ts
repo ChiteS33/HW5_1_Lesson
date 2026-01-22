@@ -1,28 +1,10 @@
-import { CommentDocument, LikesInfo, MyStatus } from './comments.entity';
+import { CommentDocument } from '../comments.entity';
 import {
   FinalWithPaginationType,
   OutPutPaginationType,
-} from '../blogs/blogs.trash';
-
-export type CommentOutPutType = {
-  id: string;
-  content: string;
-  commentatorInfo: CommentatorInfo;
-  createdAt: Date;
-  likesInfo: LikesInfo;
-};
-
-export type CommentatorInfo = {
-  userId: string;
-  userLogin: string;
-};
-
-export const mockLikeInfo = {
-  likesCount: 0,
-  dislikesCount: 0,
-  myStatus: MyStatus.none,
-  newestLikes: [],
-};
+} from '../../blogs/types/blog.types';
+import { CommentOutPutType } from '../types/comments.types';
+import { LikeDislikeStatus } from '../../posts/posts.entity';
 
 export const finalCommentsMapperWithPago = (
   comment: CommentOutPutType[],
@@ -39,12 +21,19 @@ export const finalCommentsMapperWithPago = (
 
 export const commentsFinalMapperWithCount = (
   comment: CommentDocument,
+  like: number,
+  dislike: number,
+  myStatus: LikeDislikeStatus,
 ): CommentOutPutType => {
   return {
     id: comment._id.toString(),
     content: comment.content,
     commentatorInfo: comment.commentatorInfo,
     createdAt: comment.createdAt,
-    likesInfo: mockLikeInfo,
+    likesInfo: {
+      likesCount: like,
+      dislikesCount: dislike,
+      myStatus: myStatus,
+    },
   };
 };

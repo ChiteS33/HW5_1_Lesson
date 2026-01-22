@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { MyStatus } from '../../posts/posts.entity';
+import { LikeDislikeStatus } from '../../posts/posts.entity';
 import { HydratedDocument, Model } from 'mongoose';
 
 @Schema({ versionKey: false })
@@ -8,12 +8,12 @@ export class LikeForCommentsModel {
   @Prop({ type: String, required: true }) userId: string;
   @Prop({ type: String, required: true }) login: string;
   @Prop({ type: String, required: true }) commentId: string;
-  @Prop({ type: String, enum: MyStatus, required: true }) status: string;
+  @Prop({ type: String, enum: LikeDislikeStatus, required: true })
+  status: LikeDislikeStatus;
   @Prop({ type: Date, required: true }) data: Date;
 
   public static createLikeForComment(dto: any) {
     const newLike = new LikeForCommentsModel();
-
     newLike.userId = dto.user._id.toString();
     newLike.login = dto.user.login;
     newLike.commentId = dto.commentId;
@@ -22,7 +22,7 @@ export class LikeForCommentsModel {
     return newLike;
   }
 
-  public updateCommentLikeStatus(likeStatus: string) {
+  public updateCommentLikeStatus(likeStatus: LikeDislikeStatus) {
     this.status = likeStatus;
   }
 }

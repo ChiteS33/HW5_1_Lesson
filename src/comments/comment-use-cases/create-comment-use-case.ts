@@ -1,10 +1,10 @@
 import { Inject } from '@nestjs/common';
 import { PostService } from '../../posts/posts.service';
 import { CommentsRepository } from '../repositories/comments.repository';
-import { InputDtoForCreateComment } from '../../posts/posts.trash';
 import { InjectModel } from '@nestjs/mongoose';
 import { CommentModel, CommentModelI } from '../comments.entity';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { InputDtoForCreateComment } from '../../posts/types/posts.types';
 
 export class CreateCommentCommand {
   constructor(public inputDto: InputDtoForCreateComment) {}

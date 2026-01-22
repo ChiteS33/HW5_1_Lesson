@@ -1,18 +1,5 @@
+import { IsStringWithTrim } from '../../core/decorators/validation/is-string-with-trim';
 import { Matches } from 'class-validator';
-import { IsStringWithTrim } from '../core/decorators/validation/is-string-with-trim';
-
-export class BodyInputDto {
-  @IsStringWithTrim(1, 200)
-  loginOrEmail: string;
-  @IsStringWithTrim(1, 200)
-  password: string;
-}
-
-export type OutPutInfoAboutMe = {
-  email: string;
-  login: string;
-  userId: string;
-};
 
 export class InputValidationEmail {
   @IsStringWithTrim(1, 100)
@@ -28,4 +15,11 @@ export class ConfirmPasswordRecovery {
   newPassword: string;
   @IsStringWithTrim(1, 100)
   recoveryCode: string;
+}
+
+export class BodyInputDto {
+  @IsStringWithTrim(1, 200)
+  loginOrEmail: string;
+  @IsStringWithTrim(1, 200)
+  password: string;
 }

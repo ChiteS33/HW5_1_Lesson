@@ -1,18 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { UserDocument, UserModel, UserModelI } from '../users.entity';
 import { InjectModel } from '@nestjs/mongoose';
-import {
-  FinalWithPaginationType,
-  OutPutPaginationType,
-} from '../../blogs/blogs.trash';
-
-import {
-  outPutPaginationUserMapper,
-  valuesMakerWithSearchLoginAndEmail,
-} from '../users.trash';
 import { DomainException } from '../../core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '../../core/exceptions/domain-exception-codes';
 import { SortDirection } from '../../core/dto/base.query-params.input-dto';
+import {
+  FinalWithPaginationType,
+  OutPutPaginationType,
+} from '../../blogs/types/blog.types';
+import { outPutPaginationUserMapper } from '../mappers/user.mappers';
+import { valuesMakerWithSearchLoginAndEmail } from '../../common/mappers/common.mappers';
 
 @Injectable()
 export class UsersQueryRepository {

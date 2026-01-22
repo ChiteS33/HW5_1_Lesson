@@ -23,15 +23,18 @@ export class SetLikePostUseCase implements ICommandHandler<SetLikePostCommand> {
   ) {}
   async execute(command: SetLikePostCommand): Promise<string> {
     await this.postService.findPostById(command.dto.postId);
+
     const foundPostLike =
       await this.likesForPostRepository.findLikeByUserIdAndPostId(
         command.dto.user._id.toString(),
         command.dto.postId,
       );
+
     if (!foundPostLike) {
       const newLike = this.likeForPostModel.createLikeForPost(command.dto);
       return this.likesForPostRepository.save(newLike);
     }
+
     foundPostLike.updatePostLikeStatus(command.dto.likeStatus.likeStatus);
     return this.likesForPostRepository.save(foundPostLike);
   }

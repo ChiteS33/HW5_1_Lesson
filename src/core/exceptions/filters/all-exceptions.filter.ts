@@ -1,13 +1,17 @@
-import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+} from '@nestjs/common';
 import { Response } from 'express';
 
-@Catch()
+@Catch(HttpException)
 export class AllHttpExceptionsFilter implements ExceptionFilter {
   catch(exception: any, host: ArgumentsHost): any {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const status = exception.getStatus();
-
     if (status === 400) {
       const errorsMessages: any = [];
       const responseBody: any = exception.getResponse();
@@ -17,12 +21,13 @@ export class AllHttpExceptionsFilter implements ExceptionFilter {
         return response.status(status).json({ errorsMessages: errorsMessages });
       }
     }
+
     if (status === 401) {
       return response.status(status).json({
         errorsMessages: [
           {
             field: 'token',
-            message: 'Unauthorized',
+            message: 'Unauthorizeddasdasdsdads',
           },
         ],
       });

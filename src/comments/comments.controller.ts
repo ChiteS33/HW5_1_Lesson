@@ -20,6 +20,8 @@ import { UserDocument } from '../users/users.entity';
 import { SetLikeCommentsCommand } from './comment-use-cases/setLike-comments-iser-case';
 import { CommandBus } from '@nestjs/cqrs';
 import { BearerGuard } from '../core/guards/jwt-auth.guard';
+import { OptionalBearerGuard } from '../core/guards/optional-bearer-guard.service';
+import { InPutLikeStatusValidation } from './validation/comments.validation';
 
 @Controller('comments')
 export class CommentsController {
@@ -35,7 +37,7 @@ export class CommentsController {
   async setLike(
     @Req() req: Request & { user: UserDocument },
     @Param('id') commentId: string,
-    @Body() likeStatus: string,
+    @Body() likeStatus: InPutLikeStatusValidation,
   ) {
     const inputDto = { commentId, likeStatus: likeStatus, user: req.user };
     await this.commandBus.execute(new SetLikeCommentsCommand(inputDto));
@@ -62,13 +64,21 @@ export class CommentsController {
   @UseGuards(BearerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
-  async deleteComment(@Param('id') commentId: string): Promise<void> {
-    return this.commandBus.execute(new DeleteCommentCommand(commentId));
+  async deleteComment(
+    @Param('id') commentId: string,
+    @Req() req: Request & { user: UserDocument },
+  ): Promise<void> {
+    const userId = req.user?._id?.toString();
+    return this.commandBus.execute(new DeleteCommentCommand(commentId, userId));
   }
-
+  @UseGuards(OptionalBearerGuard)
   @HttpCode(HttpStatus.OK)
   @Get(':id')
-  async getCommentById(@Param('id') commentId: string) {
-    return this.commentsQueryRepository.getCommentById(commentId);
+  async findCommentById(
+    @Param('id') commentId: string,
+    @Req() req: Request & { user: UserDocument },
+  ) {
+    const userId = req.user?._id?.toString();
+    return this.commentsQueryRepository.findCommentById(commentId, userId);
   }
 }

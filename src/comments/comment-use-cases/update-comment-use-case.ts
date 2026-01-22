@@ -3,8 +3,8 @@ import { CommentsService } from '../comments.service';
 import { DomainException } from '../../core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '../../core/exceptions/domain-exception-codes';
 import { CommentsRepository } from '../repositories/comments.repository';
-import { InputDtoForUpdateComment } from '../../posts/posts.trash';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { InputDtoForUpdateComment } from '../../posts/types/posts.types';
 
 export class UpdateCommentCommand {
   constructor(public inputDto: InputDtoForUpdateComment) {}
@@ -22,9 +22,9 @@ export class UpdateCommentUseCase implements ICommandHandler<UpdateCommentComman
     );
     if (foundComment.commentatorInfo.userId !== command.inputDto.userId) {
       throw new DomainException({
-        code: DomainExceptionCode.Unauthorized,
-        field: 'userLogin',
-        message: 'user is not correct',
+        code: DomainExceptionCode.Forbidden,
+        field: 'jwtToken',
+        message: 'You dont have permission to update a comment',
       });
     }
 

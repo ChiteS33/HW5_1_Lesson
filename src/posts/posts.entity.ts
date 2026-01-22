@@ -24,7 +24,7 @@ export class PostInputDtoForCreate {
   blogId: string;
 }
 
-export enum MyStatus {
+export enum LikeDislikeStatus {
   none = 'None',
   like = 'Like',
   dislike = 'Dislike',
@@ -54,19 +54,11 @@ export class PostModel {
   @Prop({ type: String, required: true }) blogId: string;
   @Prop({ type: String, required: true }) blogName: string;
   @Prop({ type: Date, required: true }) createdAt: Date;
-  @Prop({ _id: false, type: ExtendedLikesInfo, required: true })
-  extendedLikesInfo: ExtendedLikesInfo;
 
   public static createPost(
     dto: PostInputDtoForCreate,
     blogName: string,
   ): PostModel {
-    const extendedLikes = {
-      likesCount: 0,
-      dislikesCount: 0,
-      newestLikes: [],
-    };
-
     const newPost = new PostModel();
     newPost.title = dto.title;
     newPost.shortDescription = dto.shortDescription;
@@ -74,7 +66,7 @@ export class PostModel {
     newPost.blogId = dto.blogId;
     newPost.blogName = blogName;
     newPost.createdAt = new Date();
-    newPost.extendedLikesInfo = extendedLikes;
+
     return newPost;
   }
 

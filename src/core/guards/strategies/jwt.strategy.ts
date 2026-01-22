@@ -1,11 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { jwtConstants } from './constants';
+import { settings } from './constants';
 import { UsersRepository } from '../../../users/repositories/users.repository';
 import { UserDocument } from '../../../users/users.entity';
-import { DomainException } from '../../exceptions/domain-exceptions';
-import { DomainExceptionCode } from '../../exceptions/domain-exception-codes';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -15,7 +13,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: jwtConstants.secret,
+      secretOrKey: settings.JWT_SECRET,
     });
   }
 
@@ -23,21 +21,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     userId: string;
     iat: number;
     exp: number;
-  }): Promise<UserDocument> {
+  }): Promise<UserDocument | null> {
     if (!payload) {
-      throw new DomainException({
-        code: DomainExceptionCode.Unauthorized,
-        field: 'jwtToken',
-        message: 'Invalid payload',
-      });
+      return null;
     }
     const foundedUser = await this.usersRepository.findUserById(payload.userId);
     if (!foundedUser) {
-      throw new DomainException({
-        code: DomainExceptionCode.NotFound,
-        field: 'jwtToken',
-        message: 'User not found',
-      });
+      return null;
     }
 
     return foundedUser;

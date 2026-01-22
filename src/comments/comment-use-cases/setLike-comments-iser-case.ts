@@ -28,10 +28,9 @@ export class SetLikeCommentsUseCase implements ICommandHandler<SetLikeCommentsCo
         command.dto.user._id.toString(),
         command.dto.commentId,
       );
-
     if (!foundCommentLike) {
       const newLike = this.likeForCommentsModel.createLikeForComment(
-        command.dto.commentId,
+        command.dto,
       );
       return this.likesForCommentRepository.save(newLike);
     }

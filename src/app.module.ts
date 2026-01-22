@@ -63,9 +63,9 @@ import { JwtAdapter } from './core/adapters/jwtAdapter/jwt-adapter.service';
 import { LocalStrategy } from './core/guards/strategies/local.strategy';
 import { BasicStrategy } from './core/guards/strategies/basic.strategy';
 import { JwtStrategy } from './core/guards/strategies/jwt.strategy';
-import { jwtConstants } from './core/guards/strategies/constants';
 import { BcryptService } from './core/adapters/bcryptAdapter/bcrypt.service';
 import { EmailAdapter } from './core/adapters/emailAdapter/email-adapter';
+import { settings } from './core/guards/strategies/constants';
 
 const services = [
   UsersService,
@@ -163,7 +163,7 @@ const schemas = [
     CqrsModule,
     PassportModule,
     JwtModule.register({
-      secret: jwtConstants.secret,
+      secret: settings.JWT_SECRET,
       signOptions: { expiresIn: '1h' },
     }),
     MongooseModule.forRoot('mongodb://localhost:27017/Grecha'),

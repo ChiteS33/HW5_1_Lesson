@@ -10,18 +10,14 @@ import {
   Post,
   Put,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { BlogInputDto } from './blogs.entity';
 import { BlogsQueryRepository } from './repositories/blogs.queryRepository';
 import { PostService } from '../posts/posts.service';
 import { PostInputDto } from '../posts/posts.entity';
 import { PostsQueryRepository } from '../posts/repositories/posts.queryRepository';
-import {
-  BlogOutPutType,
-  FinalWithPaginationType,
-  InputPaginationWithSearchName,
-} from './blogs.trash';
-import { PostOutPutType } from '../posts/posts.trash';
 import { CreateBlogCommand } from './blog-use-cases/create-blog-use-case';
 import { UpdateBlogCommand } from './blog-use-cases/update-blog-use-case';
 import { DeleteBlogCommand } from './blog-use-cases/delete-blog-use-case';
@@ -31,6 +27,13 @@ import {
 } from '../posts/post-use-cases/create-post-use-case';
 import { CommandBus } from '@nestjs/cqrs';
 import { InputPaginationType } from '../core/dto/base.query-params.input-dto';
+import { InputPaginationWithSearchName } from './validation/blog.validation';
+import { BlogOutPutType, FinalWithPaginationType } from './types/blog.types';
+import { PostOutPutType } from '../posts/types/posts.types';
+import { BasicAuthGuard } from '../core/guards/basic-auth-guard.service';
+import { OptionalBearerGuard } from '../core/guards/optional-bearer-guard.service';
+import { Request } from 'express';
+import { UserDocument } from '../users/users.entity';
 
 @Controller('blogs')
 export class BlogsController {
@@ -51,7 +54,7 @@ export class BlogsController {
   ): Promise<FinalWithPaginationType<BlogOutPutType>> {
     return await this.blogsQueryRepository.getAllBlogs(query);
   }
-
+  @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.CREATED)
   @Post()
   async createBlog(
@@ -64,16 +67,23 @@ export class BlogsController {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return await this.blogsQueryRepository.getBlogById(createdBlogId);
   }
-
+  @UseGuards(OptionalBearerGuard)
   @HttpCode(HttpStatus.OK)
   @Get(':id/posts')
   async getAllPostsByBlogId(
     @Param('id') blogId: string,
     @Query() query: InputPaginationType,
+    @Req() req: Request & { user: UserDocument },
   ): Promise<FinalWithPaginationType<PostOutPutType>> {
-    return this.postsQueryRepository.findAllPostsByBlogId(blogId, query);
+    const userId = req.user?._id?.toString();
+    return this.postsQueryRepository.findAllPostsByBlogId(
+      blogId,
+      query,
+      userId,
+    );
   }
 
+  @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.CREATED)
   @Post(':id/posts')
   async createPostByBlogId(
@@ -95,6 +105,7 @@ export class BlogsController {
     return this.blogsQueryRepository.getBlogById(blogId);
   }
 
+  @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Put(':id')
   async updateBlogById(
@@ -105,6 +116,7 @@ export class BlogsController {
     return this.commandBus.execute(new UpdateBlogCommand(blogId, blogInputDto));
   }
 
+  @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
   async deleteBlog(@Param('id') blogId: string) {

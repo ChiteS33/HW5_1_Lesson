@@ -1,9 +1,9 @@
 import { Inject } from '@nestjs/common';
 import { AuthService } from '../auth.service';
 import { UserDocument } from '../../users/users.entity';
-import { BodyInputDto } from '../auth.trash';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { JwtAdapter } from '../../core/adapters/jwtAdapter/jwt-adapter.service';
+import { BodyInputDto } from '../validation/auth.validation';
 
 export class LoginUseCommand {
   constructor(

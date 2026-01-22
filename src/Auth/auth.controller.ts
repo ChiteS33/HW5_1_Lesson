@@ -7,14 +7,9 @@ import {
   Req,
   Get,
   Body,
+  Res,
 } from '@nestjs/common';
-import {
-  BodyInputDto,
-  ConfirmPasswordRecovery,
-  InputValidationCode,
-  InputValidationEmail,
-} from './auth.trash';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { UserDocument, UserInputDto } from '../users/users.entity';
 import { LoginUseCommand } from './auth-use-cases/login-use-case';
 import { RecoveryPasswordCommand } from './auth-use-cases/recovery-password-use-case';
@@ -26,6 +21,12 @@ import { GetInfoAboutUserCommand } from './auth-use-cases/get-info-about-user-us
 import { CommandBus } from '@nestjs/cqrs';
 import { BearerGuard } from '../core/guards/jwt-auth.guard';
 import { BasicGuard } from '../core/guards/basic-guard.service';
+import {
+  BodyInputDto,
+  ConfirmPasswordRecovery,
+  InputValidationCode,
+  InputValidationEmail,
+} from './validation/auth.validation';
 
 @Controller('auth')
 export class AuthController {
@@ -37,9 +38,18 @@ export class AuthController {
   async login(
     @Req() req: Request & { user: UserDocument },
     @Body() body: BodyInputDto,
+    @Res({ passthrough: true }) res: Response,
   ) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return this.commandBus.execute(new LoginUseCommand(req.user, body));
+    const tokens = await this.commandBus.execute(
+      new LoginUseCommand(req.user, body),
+    );
+    res.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 20000000,
+    });
+    return { accessToken: tokens.accessToken };
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)

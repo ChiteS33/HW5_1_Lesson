@@ -1,6 +1,6 @@
-import { OutPutInfoAboutMe } from '../auth.trash';
 import { UserDocument } from '../../users/users.entity';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { OutPutInfoAboutMe } from '../types/auth.types';
 
 export class GetInfoAboutUserCommand {
   constructor(public user: UserDocument) {}

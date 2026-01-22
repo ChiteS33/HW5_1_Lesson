@@ -20,7 +20,7 @@ import { CreateCommentCommand } from '../comments/comment-use-cases/create-comme
 import { CreatePostCommand } from './post-use-cases/create-post-use-case';
 import { Request } from 'express';
 import { UserDocument } from '../users/users.entity';
-import { ContentInputDto, MyStatus } from '../comments/comments.entity';
+import { ContentInputDto } from '../comments/comments.entity';
 import { SetLikePostCommand } from './post-use-cases/setLike-post-use-case';
 import { UpdatePostCommand } from './post-use-cases/update-post-use-case';
 import { DeletePostCommand } from './post-use-cases/delete-post-use-case';
@@ -28,6 +28,8 @@ import { CommandBus } from '@nestjs/cqrs';
 import { InputPaginationType } from '../core/dto/base.query-params.input-dto';
 import { BearerGuard } from '../core/guards/jwt-auth.guard';
 import { BasicAuthGuard } from '../core/guards/basic-auth-guard.service';
+import { OptionalBearerGuard } from '../core/guards/optional-bearer-guard.service';
+import { InPutLikeStatusValidation } from '../comments/validation/comments.validation';
 
 @Controller('posts')
 export class PostsController {
@@ -45,22 +47,25 @@ export class PostsController {
   async setLike(
     @Req() req: Request & { user: UserDocument },
     @Param('id') postId: string,
-    @Body() likeStatus: MyStatus,
+    @Body() likeStatus: InPutLikeStatusValidation,
   ) {
-    const inputDto = { postId, myStatus: likeStatus, user: req.user };
+    const inputDto = { postId, likeStatus: likeStatus, user: req.user };
     await this.commandBus.execute(new SetLikePostCommand(inputDto));
     return;
   }
-
+  @UseGuards(OptionalBearerGuard)
   @HttpCode(HttpStatus.OK)
   @Get(':id/comments')
   async getAllCommentsByPostId(
     @Param('id') postId: string,
     @Query() pagination: InputPaginationType,
+    @Req() req: Request & { user: UserDocument },
   ) {
-    return this.commentsQueryRepository.getAllCommentsByPostId(
+    const userId = req.user?._id?.toString();
+    return this.commentsQueryRepository.findAllCommentsByPostId(
       postId,
       pagination,
+      userId,
     );
   }
 
@@ -83,13 +88,17 @@ export class PostsController {
       new CreateCommentCommand(inputDto),
     );
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    return this.commentsQueryRepository.getCommentById(createdCommentId);
+    return this.commentsQueryRepository.findCommentById(createdCommentId);
   }
-
+  @UseGuards(OptionalBearerGuard)
   @HttpCode(HttpStatus.OK)
   @Get()
-  async getAllPosts(@Query() query: InputPaginationType) {
-    return this.postsQueryRepository.findAllPosts(query);
+  async getAllPosts(
+    @Query() query: InputPaginationType,
+    @Req() req: Request & { user: UserDocument },
+  ) {
+    const userId = req.user?._id?.toString();
+    return this.postsQueryRepository.findAllPosts(query, userId);
   }
 
   @UseGuards(BasicAuthGuard)
@@ -103,11 +112,15 @@ export class PostsController {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return this.postsQueryRepository.findPostByPostId(createdPostId);
   }
-
+  @UseGuards(OptionalBearerGuard)
   @HttpCode(HttpStatus.OK)
   @Get(':id')
-  async getPostById(@Param('id') postId: string) {
-    return this.postsQueryRepository.findPostByPostId(postId);
+  async findPostById(
+    @Param('id') postId: string,
+    @Req() req: Request & { user: UserDocument },
+  ) {
+    const userId = req.user?._id?.toString();
+    return this.postsQueryRepository.findPostByPostId(postId, userId);
   }
 
   @UseGuards(BasicAuthGuard)

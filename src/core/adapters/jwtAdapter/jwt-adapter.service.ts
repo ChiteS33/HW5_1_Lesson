@@ -9,7 +9,7 @@ export class JwtAdapter {
   constructor() {}
 
   createJWT(userId: string): string {
-    return jwt.sign({ userId }, settings.JWT_SECRET, { expiresIn: '1h' });
+    return jwt.sign({ userId }, settings.JWT_SECRET, { expiresIn: '2h' });
   }
 
   async getUserIdByToken(token: string): Promise<string | null> {

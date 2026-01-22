@@ -13,11 +13,11 @@ import {
 } from '@nestjs/common';
 import { UsersQueryRepository } from './repositories/users.queryRepository';
 import { UserInputDto } from './users.entity';
-import { InPutPaginationWithSearchLoginTermAndSearchEMailTerm } from './users.trash';
 import { CreateUserCommand } from './user-use-cases/create-user-use-case';
 import { CommandBus } from '@nestjs/cqrs';
 import { DeleteUserCommand } from './user-use-cases/delete-user-use-case';
 import { BasicAuthGuard } from '../core/guards/basic-auth-guard.service';
+import { InPutPaginationWithSearchLoginTermAndSearchEMailTerm } from './validation/users.validation';
 
 @Controller(`users`)
 export class UsersController {

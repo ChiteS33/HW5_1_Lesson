@@ -1,8 +1,8 @@
 import { HydratedDocument, Model } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-
-import { InputDtoForCreateComment } from '../posts/posts.trash';
 import { IsStringWithTrim } from '../core/decorators/validation/is-string-with-trim';
+import { InputDtoForCreateComment } from '../posts/types/posts.types';
+import { LikeDislikeStatus } from '../posts/posts.entity';
 
 export type CommentDocument = HydratedDocument<CommentModel>;
 
@@ -33,35 +33,31 @@ export class CommentatorInfo {
 export class LikesInfo {
   @Prop({ type: String, default: 0 }) likesCount: number;
   @Prop({ type: String, default: 0 }) dislikesCount: number;
-  @Prop({ enum: MyStatus }) myStatus: MyStatus;
+  @Prop({ enum: LikeDislikeStatus }) myStatus: LikeDislikeStatus;
 }
 
 @Schema({ versionKey: false })
 export class CommentModel {
   constructor() {}
   @Prop({ type: String, required: true }) content: string;
-  @Prop({ type: CommentatorInfo, required: true })
+  @Prop({ type: String, required: true }) postId: string;
+  @Prop({ type: CommentatorInfo, _id: false, required: true })
   commentatorInfo: CommentatorInfo;
   @Prop({ type: Date, required: true }) createdAt: Date;
-  @Prop({ type: LikesInfo, required: true }) likesInfo: LikesInfo;
 
   public static createComment(
     inputDto: InputDtoForCreateComment,
   ): CommentModel {
-    const likeInfo = {
-      likesCount: 1,
-      dislikesCount: 3,
-      myStatus: MyStatus.none,
-    };
     const commentInfo = {
       userId: inputDto.userId,
       userLogin: inputDto.userLogin,
     };
     const newComment = new CommentModel();
     newComment.content = inputDto.content;
+    newComment.postId = inputDto.postId;
     newComment.commentatorInfo = commentInfo;
     newComment.createdAt = new Date();
-    newComment.likesInfo = likeInfo;
+
     return newComment;
   }
 
