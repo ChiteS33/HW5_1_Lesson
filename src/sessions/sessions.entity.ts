@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
+import { Payload } from '../common/types/common.types';
 
 @Schema({ versionKey: false })
 export class SessionsModel {
@@ -12,7 +13,7 @@ export class SessionsModel {
   @Prop({ type: String, required: true }) exp: string;
 
   public static createSession(
-    payload: any,
+    payload: Payload,
     sessionIp: string,
     deviceName: string,
   ): SessionsModel {
@@ -26,7 +27,7 @@ export class SessionsModel {
     return newSession;
   }
 
-  updateSession(newIat: number, newExp: number) {
+  updateSession(newIat: number, newExp: number): void {
     this.iat = new Date(newIat * 1000).toISOString();
     this.exp = new Date(newExp * 1000).toISOString();
     return;

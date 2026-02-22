@@ -48,9 +48,10 @@ export class PostsController {
     @Req() req: Request & { user: UserDocument },
     @Param('id') postId: string,
     @Body() likeStatus: InPutLikeStatusValidation,
-  ) {
-    const inputDto = { postId, likeStatus: likeStatus, user: req.user };
-    await this.commandBus.execute(new SetLikePostCommand(inputDto));
+  ): Promise<void> {
+    await this.commandBus.execute(
+      new SetLikePostCommand(postId, likeStatus.likeStatus, req.user),
+    );
     return;
   }
   @UseGuards(OptionalBearerGuard)
@@ -83,11 +84,9 @@ export class PostsController {
       userId: req.user.id,
       userLogin: req.user.login,
     };
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const createdCommentId = await this.commandBus.execute(
+    const createdCommentId: string = await this.commandBus.execute(
       new CreateCommentCommand(inputDto),
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return this.commentsQueryRepository.findCommentById(createdCommentId);
   }
   @UseGuards(OptionalBearerGuard)
@@ -105,13 +104,12 @@ export class PostsController {
   @HttpCode(HttpStatus.CREATED)
   @Post()
   async createPost(@Body() postInputDto: PostInputDtoForCreate) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const createdPostId = await this.commandBus.execute(
+    const createdPostId: string = await this.commandBus.execute(
       new CreatePostCommand(postInputDto),
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return this.postsQueryRepository.findPostByPostId(createdPostId);
   }
+
   @UseGuards(OptionalBearerGuard)
   @HttpCode(HttpStatus.OK)
   @Get(':id')

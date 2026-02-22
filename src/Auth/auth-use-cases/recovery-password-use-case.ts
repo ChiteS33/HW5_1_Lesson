@@ -4,6 +4,7 @@ import { DomainExceptionCode } from '../../core/exceptions/domain-exception-code
 import { UsersRepository } from '../../users/repositories/users.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { EmailAdapter } from '../../core/adapters/emailAdapter/email-adapter';
+import { UserDocument } from '../../users/users.entity';
 
 export class RecoveryPasswordCommand {
   constructor(public email: string) {}
@@ -17,9 +18,8 @@ export class RecoveryPasswordUseCase implements ICommandHandler<RecoveryPassword
   ) {}
 
   async execute(command: RecoveryPasswordCommand): Promise<void> {
-    const foundUser = await this.usersRepository.findUserByLoginOrEmail(
-      command.email,
-    );
+    const foundUser: UserDocument | null =
+      await this.usersRepository.findUserByLoginOrEmail(command.email);
     if (!foundUser) {
       throw new DomainException({
         code: DomainExceptionCode.Unauthorized,

@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { LikeDislikeStatus } from '../../posts/posts.entity';
 import { HydratedDocument, Model } from 'mongoose';
+import { InputLikeDTOForComment } from './types/inputLikeDTO';
 
 @Schema({ versionKey: false })
 export class LikeForCommentsModel {
@@ -12,12 +13,12 @@ export class LikeForCommentsModel {
   status: LikeDislikeStatus;
   @Prop({ type: Date, required: true }) data: Date;
 
-  public static createLikeForComment(dto: any) {
+  public static createLikeForComment(dto: InputLikeDTOForComment) {
     const newLike = new LikeForCommentsModel();
     newLike.userId = dto.user._id.toString();
     newLike.login = dto.user.login;
     newLike.commentId = dto.commentId;
-    newLike.status = dto.likeStatus.likeStatus;
+    newLike.status = dto.likeStatus;
     newLike.data = new Date();
     return newLike;
   }

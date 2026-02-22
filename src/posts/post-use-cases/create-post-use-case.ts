@@ -17,7 +17,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
     @Inject(PostsRepository) private postsRepository: PostsRepository,
   ) {}
 
-  async execute(command: CreatePostCommand) {
+  async execute(command: CreatePostCommand): Promise<string> {
     const foundBlog = await this.blogsRepository.findBlogByBlogId(
       command.inputDto.blogId,
     );

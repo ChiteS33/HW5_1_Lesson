@@ -22,6 +22,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { BearerGuard } from '../core/guards/jwt-auth.guard';
 import { OptionalBearerGuard } from '../core/guards/optional-bearer-guard.service';
 import { InPutLikeStatusValidation } from './validation/comments.validation';
+import { CommentOutPutType } from './types/comments.types';
 
 @Controller('comments')
 export class CommentsController {
@@ -38,10 +39,10 @@ export class CommentsController {
     @Req() req: Request & { user: UserDocument },
     @Param('id') commentId: string,
     @Body() likeStatus: InPutLikeStatusValidation,
-  ) {
-    const inputDto = { commentId, likeStatus: likeStatus, user: req.user };
-    await this.commandBus.execute(new SetLikeCommentsCommand(inputDto));
-    return;
+  ): Promise<void> {
+    await this.commandBus.execute(
+      new SetLikeCommentsCommand(commentId, likeStatus.likeStatus, req.user),
+    );
   }
 
   @UseGuards(BearerGuard)
@@ -51,14 +52,13 @@ export class CommentsController {
     @Req() req: Request & { user: UserDocument },
     @Param('id') commentId: string,
     @Body() content: ContentInputDto,
-  ) {
+  ): Promise<void> {
     const inputDto = {
       commentId,
       content: content.content,
       userId: req.user.id,
     };
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return await this.commandBus.execute(new UpdateCommentCommand(inputDto));
+    await this.commandBus.execute(new UpdateCommentCommand(inputDto));
   }
 
   @UseGuards(BearerGuard)
@@ -71,13 +71,14 @@ export class CommentsController {
     const userId = req.user?._id?.toString();
     return this.commandBus.execute(new DeleteCommentCommand(commentId, userId));
   }
+
   @UseGuards(OptionalBearerGuard)
   @HttpCode(HttpStatus.OK)
   @Get(':id')
   async findCommentById(
     @Param('id') commentId: string,
     @Req() req: Request & { user: UserDocument },
-  ) {
+  ): Promise<CommentOutPutType | null> {
     const userId = req.user?._id?.toString();
     return this.commentsQueryRepository.findCommentById(commentId, userId);
   }

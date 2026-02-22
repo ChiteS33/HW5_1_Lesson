@@ -25,7 +25,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!payload) {
       return null;
     }
-    const foundedUser = await this.usersRepository.findUserById(payload.userId);
+    const foundedUser: UserDocument | null =
+      await this.usersRepository.findUserById(payload.userId);
     if (!foundedUser) {
       return null;
     }

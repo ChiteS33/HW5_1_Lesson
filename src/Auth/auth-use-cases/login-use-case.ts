@@ -7,6 +7,7 @@ import { BodyInputDto } from '../validation/auth.validation';
 import { InjectModel } from '@nestjs/mongoose';
 import { SessionModelI, SessionsModel } from '../../sessions/sessions.entity';
 import { SessionsRepository } from '../../sessions/repostiory/sessions.repository';
+import { Payload } from '../../common/types/common.types';
 
 export class LoginUseCommand {
   constructor(
@@ -32,7 +33,7 @@ export class LoginUseCase implements ICommandHandler<LoginUseCommand> {
     const userId = command.user._id.toString();
     const accessToken = this.jwtService.createJWT(userId);
     const refreshToken = this.jwtService.createRefreshToken(userId);
-    const payload = await this.jwtService.decodeJWT(refreshToken);
+    const payload: Payload = this.jwtService.decodeJWT(refreshToken);
 
     const createdSession = this.sessionsModel.createSession(
       payload,

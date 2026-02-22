@@ -1,12 +1,7 @@
 import { IsEnum } from 'class-validator';
-
-export enum MyStatus {
-  none = 'None',
-  like = 'Like',
-  dislike = 'Dislike',
-}
+import { LikeDislikeStatus } from '../../posts/posts.entity';
 
 export class InPutLikeStatusValidation {
-  @IsEnum(MyStatus)
-  likeStatus: MyStatus;
+  @IsEnum(LikeDislikeStatus)
+  likeStatus: LikeDislikeStatus;
 }

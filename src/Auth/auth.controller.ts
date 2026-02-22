@@ -10,11 +10,7 @@ import {
   Res,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import {
-  RefreshTokenDto,
-  UserDocument,
-  UserInputDto,
-} from '../users/users.entity';
+import { UserDocument, UserInputDto } from '../users/users.entity';
 import { LoginUseCommand } from './auth-use-cases/login-use-case';
 import { RecoveryPasswordCommand } from './auth-use-cases/recovery-password-use-case';
 import { ConfirmPasswordRecoveryCommand } from './auth-use-cases/confirm-password-use-case';
@@ -35,6 +31,7 @@ import { LogoutCommand } from './auth-use-cases/logout-use-case';
 import { RefreshTokensCommand } from './auth-use-cases/refresh-tokens-use-case';
 import { JwtRefreshGuard } from '../core/guards/refreshTokenGuard';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import { PairTokens } from './types/auth.types';
 
 @Controller('auth')
 export class AuthController {
@@ -42,16 +39,16 @@ export class AuthController {
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('password-recovery')
-  async recoveryPassword(@Body() dto: InputValidationEmail) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return this.commandBus.execute(new RecoveryPasswordCommand(dto.email));
+  async recoveryPassword(@Body() dto: InputValidationEmail): Promise<void> {
+    await this.commandBus.execute(new RecoveryPasswordCommand(dto.email));
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('new-password')
-  async confirmPasswordRecovery(@Body() dto: ConfirmPasswordRecovery) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return this.commandBus.execute(
+  async confirmPasswordRecovery(
+    @Body() dto: ConfirmPasswordRecovery,
+  ): Promise<void> {
+    await this.commandBus.execute(
       new ConfirmPasswordRecoveryCommand(dto.newPassword, dto.recoveryCode),
     );
   }
@@ -63,7 +60,7 @@ export class AuthController {
     @Body() body: BodyInputDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const tokens = await this.commandBus.execute(
+    const tokens: PairTokens = await this.commandBus.execute(
       new LoginUseCommand(
         req.user,
         body,
@@ -86,38 +83,35 @@ export class AuthController {
     @Req() req: Request & { user: UserDocument },
     @Res({ passthrough: true }) res: Response,
   ) {
-    const refreshToken = req.cookies.refreshToken;
-    const tokens = await this.commandBus.execute(
+    const refreshToken = req.cookies.refreshToken as string;
+    const tokens: PairTokens = await this.commandBus.execute(
       new RefreshTokensCommand(refreshToken),
     );
-    res.cookie('refreshToken', tokens.newRefreshToken, {
+    res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
       maxAge: 20 * 10000,
     });
-    return { accessToken: tokens.newAccessToken };
+    return { accessToken: tokens.accessToken };
   }
   @UseGuards(ThrottlerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-confirmation')
   async confirmRegistration(@Body() dto: InputValidationCode) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return this.commandBus.execute(new ConfirmRegistrationCommand(dto.code));
+    await this.commandBus.execute(new ConfirmRegistrationCommand(dto.code));
   }
   @UseGuards(ThrottlerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration')
   async registrationInSystem(@Body() dto: UserInputDto) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return this.commandBus.execute(new RegistrationInSystemCommand(dto));
+    await this.commandBus.execute(new RegistrationInSystemCommand(dto));
   }
   @UseGuards(ThrottlerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-email-resending')
   async resendEmail(@Body() dto: InputValidationEmail) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return this.commandBus.execute(
+    await this.commandBus.execute(
       new ResendEmailResendingEmailCommand(dto.email),
     );
   }
@@ -125,7 +119,7 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('logout')
   async logout(@Req() req: Request & { user: UserDocument }) {
-    const refreshToken = req.cookies.refreshToken; //RefreshTokenDto
+    const refreshToken = req.cookies.refreshToken as string;
     await this.commandBus.execute(new LogoutCommand(refreshToken));
     return;
   }

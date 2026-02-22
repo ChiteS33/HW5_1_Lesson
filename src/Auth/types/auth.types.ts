@@ -3,3 +3,8 @@ export type OutPutInfoAboutMe = {
   login: string;
   userId: string;
 };
+
+export type PairTokens = {
+  accessToken: string;
+  refreshToken: string;
+};

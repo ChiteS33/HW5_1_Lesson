@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { LikeDislikeStatus } from '../../posts/posts.entity';
 import { HydratedDocument, Model } from 'mongoose';
+import { UserDocument } from '../../users/users.entity';
 
 @Schema({ versionKey: false })
 export class LikeForPostModel {
@@ -12,12 +13,16 @@ export class LikeForPostModel {
   status: LikeDislikeStatus;
   @Prop({ type: Date, required: true }) data: Date;
 
-  public static createLikeForPost(dto: any) {
+  public static createLikeForPost(
+    postId: string,
+    likeStatus: LikeDislikeStatus,
+    user: UserDocument,
+  ): LikeForPostModel {
     const newLike = new LikeForPostModel();
-    newLike.userId = dto.user._id.toString();
-    newLike.login = dto.user.login;
-    newLike.postId = dto.postId;
-    newLike.status = dto.likeStatus.likeStatus;
+    newLike.userId = user._id.toString();
+    newLike.login = user.login;
+    newLike.postId = postId;
+    newLike.status = likeStatus;
 
     newLike.data = new Date();
 

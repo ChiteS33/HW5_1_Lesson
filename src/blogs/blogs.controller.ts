@@ -15,16 +15,12 @@ import {
 } from '@nestjs/common';
 import { BlogInputDto } from './blogs.entity';
 import { BlogsQueryRepository } from './repositories/blogs.queryRepository';
-import { PostService } from '../posts/posts.service';
 import { PostInputDto } from '../posts/posts.entity';
 import { PostsQueryRepository } from '../posts/repositories/posts.queryRepository';
 import { CreateBlogCommand } from './blog-use-cases/create-blog-use-case';
 import { UpdateBlogCommand } from './blog-use-cases/update-blog-use-case';
 import { DeleteBlogCommand } from './blog-use-cases/delete-blog-use-case';
-import {
-  CreatePostCommand,
-  CreatePostUseCase,
-} from '../posts/post-use-cases/create-post-use-case';
+import { CreatePostCommand } from '../posts/post-use-cases/create-post-use-case';
 import { CommandBus } from '@nestjs/cqrs';
 import { InputPaginationType } from '../core/dto/base.query-params.input-dto';
 import { InputPaginationWithSearchName } from './validation/blog.validation';
@@ -41,10 +37,8 @@ export class BlogsController {
     private commandBus: CommandBus,
     @Inject(BlogsQueryRepository)
     private blogsQueryRepository: BlogsQueryRepository,
-    @Inject(PostService) private postsService: PostService,
     @Inject(PostsQueryRepository)
     private postsQueryRepository: PostsQueryRepository,
-    @Inject(CreatePostUseCase) private createPostUseCase: CreatePostUseCase,
   ) {}
 
   @HttpCode(HttpStatus.OK)
@@ -60,11 +54,9 @@ export class BlogsController {
   async createBlog(
     @Body() blogInputDto: BlogInputDto,
   ): Promise<BlogOutPutType> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const createdBlogId = await this.commandBus.execute(
+    const createdBlogId: string = await this.commandBus.execute(
       new CreateBlogCommand(blogInputDto),
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return await this.blogsQueryRepository.getBlogById(createdBlogId);
   }
   @UseGuards(OptionalBearerGuard)
@@ -89,19 +81,17 @@ export class BlogsController {
   async createPostByBlogId(
     @Param('id') blogId: string,
     @Body() postInputDto: PostInputDto,
-  ) {
+  ): Promise<PostOutPutType> {
     const infoForCreatePost = { ...postInputDto, blogId };
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const createdPostId = await this.commandBus.execute(
+    const createdPostId: string = await this.commandBus.execute(
       new CreatePostCommand(infoForCreatePost),
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return this.postsQueryRepository.findPostByPostId(createdPostId);
   }
 
   @HttpCode(HttpStatus.OK)
   @Get(':id')
-  async getBlogById(@Param('id') blogId: string) {
+  async getBlogById(@Param('id') blogId: string): Promise<BlogOutPutType> {
     return this.blogsQueryRepository.getBlogById(blogId);
   }
 
@@ -111,21 +101,14 @@ export class BlogsController {
   async updateBlogById(
     @Param('id') blogId: string,
     @Body() blogInputDto: BlogInputDto,
-  ) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return this.commandBus.execute(new UpdateBlogCommand(blogId, blogInputDto));
+  ): Promise<void> {
+    await this.commandBus.execute(new UpdateBlogCommand(blogId, blogInputDto));
   }
 
   @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':id')
-  async deleteBlog(@Param('id') blogId: string) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return this.commandBus.execute(new DeleteBlogCommand(blogId));
-  }
-
-  @Get('s')
-  kek() {
-    return 'kekwek';
+  async deleteBlog(@Param('id') blogId: string): Promise<void> {
+    await this.commandBus.execute(new DeleteBlogCommand(blogId));
   }
 }

@@ -5,6 +5,8 @@ import {
   SessionsDocument,
   SessionsModel,
 } from '../sessions.entity';
+import { OutPutSessionDTO } from '../types/output-dto';
+import { outPutSessionMapper } from '../mappers/outputMapper';
 
 @Injectable()
 export class SessionsRepository {
@@ -17,7 +19,7 @@ export class SessionsRepository {
     return dataAboutSavedSession._id.toString();
   }
 
-  async findAllSessions(userId: string): Promise<any> {
+  async findAllSessions(userId: string): Promise<OutPutSessionDTO[]> {
     const foundSessions = await this.sessionModel.find({
       userId: userId,
       exp: { $gt: new Date().toISOString() },
@@ -25,7 +27,7 @@ export class SessionsRepository {
     return foundSessions.map(outPutSessionMapper);
   }
 
-  async deleteAlmostAll(userId: string, deviceId: string): Promise<any> {
+  async deleteAlmostAll(userId: string, deviceId: string): Promise<void> {
     await this.sessionModel.deleteMany({
       userId: userId,
       deviceId: { $ne: deviceId },
@@ -33,7 +35,9 @@ export class SessionsRepository {
     return;
   }
 
-  async findSessionByDeviceId(deviceId: string): Promise<any> {
+  async findSessionByDeviceId(
+    deviceId: string,
+  ): Promise<SessionsDocument | null> {
     return this.sessionModel.findOne({ deviceId: deviceId });
   }
 
@@ -45,16 +49,7 @@ export class SessionsRepository {
   async findSessionByUserIdAndDeviceId(
     userId: string,
     deviceId: string,
-  ): Promise<any> {
+  ): Promise<SessionsDocument | null> {
     return this.sessionModel.findOne({ deviceId, userId });
   }
 }
-
-export const outPutSessionMapper = (dto: SessionsDocument) => {
-  return {
-    ip: dto._id.toString(),
-    title: dto.deviceName,
-    lastActiveDate: dto.iat,
-    deviceId: dto.deviceId,
-  };
-};

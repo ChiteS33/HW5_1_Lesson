@@ -8,3 +8,10 @@ export type PaginationWithSearchLoginTermAndSearchEMailTermForRepo = {
   searchLoginTerm: string;
   searchEmailTerm: string;
 };
+
+export type Payload = {
+  userId: string;
+  deviceId: string;
+  iat: number;
+  exp: number;
+};
