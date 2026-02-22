@@ -3,19 +3,11 @@ import {
   FinalWithPaginationType,
   OutPutPaginationType,
 } from '../../blogs/types/blog.types';
-import { LikeInDbForPost, PostOutPutType } from '../types/posts.types';
-
-export const postMapper = (post: PostDocument): PostOutPutType => {
-  return {
-    id: post._id.toString(),
-    title: post.title,
-    shortDescription: post.shortDescription,
-    content: post.content,
-    blogId: post.blogId,
-    blogName: post.blogName,
-    createdAt: post.createdAt.toISOString(),
-  };
-};
+import {
+  LikeInDbForPost,
+  PostOutPutType,
+  PostOutPutTypeWIthLikes,
+} from '../types/posts.types';
 
 export const finalPaginationWithPostValue = (
   postValue: PostOutPutType[],
@@ -32,11 +24,11 @@ export const finalPaginationWithPostValue = (
 
 export const outPutMapperForPostWithNewestLikes = (
   post: PostDocument,
-  totalCountLike: any,
-  totalCountDislike: any,
+  totalCountLike: number,
+  totalCountDislike: number,
   status: string,
   newestLikesForPost: LikeInDbForPost[],
-): any => {
+): PostOutPutTypeWIthLikes => {
   return {
     id: post._id.toString(),
     title: post.title,

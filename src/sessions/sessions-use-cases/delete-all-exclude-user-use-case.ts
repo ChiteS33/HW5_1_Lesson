@@ -14,10 +14,8 @@ export class DeleteAllExcludeUserUseCase implements ICommandHandler<DeleteAllExc
     @Inject(JwtAdapter) private jwtAdapter: JwtAdapter,
   ) {}
 
-  async execute(command: DeleteAllExcludeUserCommand): Promise<any> {
-    const payloadRefreshToken = await this.jwtAdapter.decodeJWT(
-      command.refreshToken,
-    );
+  async execute(command: DeleteAllExcludeUserCommand): Promise<void> {
+    const payloadRefreshToken = this.jwtAdapter.decodeJWT(command.refreshToken);
     await this.sessionsRepository.deleteAlmostAll(
       payloadRefreshToken.userId,
       payloadRefreshToken.deviceId,

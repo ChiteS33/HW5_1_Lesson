@@ -1,4 +1,4 @@
-import { LikesInfo, MyStatus } from '../comments.entity';
+import { LikesInfo } from '../comments.entity';
 
 export type CommentOutPutType = {
   id: string;

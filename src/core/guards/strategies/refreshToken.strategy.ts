@@ -5,6 +5,7 @@ import { settings } from './constants';
 import { SessionsRepository } from '../../../sessions/repostiory/sessions.repository';
 import { DomainException } from '../../exceptions/domain-exceptions';
 import { DomainExceptionCode } from '../../exceptions/domain-exception-codes';
+import { Payload } from '../../../common/types/common.types';
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(
@@ -23,7 +24,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
     });
   }
 
-  async validate(payload: any) {
+  async validate(payload: Payload) {
     const foundSession = await this.sessionsRepository.findSessionByDeviceId(
       payload.deviceId,
     );

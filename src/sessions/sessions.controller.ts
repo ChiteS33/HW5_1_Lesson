@@ -15,6 +15,7 @@ import { FindAllSessionsCommand } from './sessions-use-cases/find-sessions-use-c
 import { DeleteAllExcludeUserCommand } from './sessions-use-cases/delete-all-exclude-user-use-case';
 import { DeleteSessionByDeviceIdCommand } from './sessions-use-cases/delete-session-by-user-use-case';
 import { JwtRefreshGuard } from '../core/guards/refreshTokenGuard';
+import { OutPutSessionDTO } from './types/output-dto';
 
 @Controller('security/devices')
 export class SessionsController {
@@ -23,16 +24,18 @@ export class SessionsController {
   @UseGuards(JwtRefreshGuard)
   @HttpCode(HttpStatus.OK)
   @Get()
-  async findAllSessionForUser(@Req() req: Request & { user: UserDocument }) {
-    const refreshToken = req.cookies.refreshToken;
+  async findAllSessionForUser(
+    @Req() req: Request & { user: UserDocument },
+  ): Promise<OutPutSessionDTO[]> {
+    const refreshToken = req.cookies.refreshToken as string;
     return this.commandBus.execute(new FindAllSessionsCommand(refreshToken));
   }
   @UseGuards(JwtRefreshGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete()
   async deleteAllExcludeCurrent(@Req() req: Request & { user: UserDocument }) {
-    const refreshToken = req.cookies.refreshToken;
-    return this.commandBus.execute(
+    const refreshToken = req.cookies.refreshToken as string;
+    await this.commandBus.execute(
       new DeleteAllExcludeUserCommand(refreshToken),
     );
   }
@@ -43,8 +46,8 @@ export class SessionsController {
     @Req() req: Request & { user: UserDocument },
     @Param('id') deviceId: string,
   ) {
-    const refreshToken = req.cookies.refreshToken;
-    return this.commandBus.execute(
+    const refreshToken = req.cookies.refreshToken as string;
+    await this.commandBus.execute(
       new DeleteSessionByDeviceIdCommand(deviceId, refreshToken),
     );
   }

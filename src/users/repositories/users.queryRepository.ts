@@ -1,15 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { UserDocument, UserModel, UserModelI } from '../users.entity';
+import { UserModel, UserModelI } from '../users.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { DomainException } from '../../core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '../../core/exceptions/domain-exception-codes';
-import { SortDirection } from '../../core/dto/base.query-params.input-dto';
 import {
   FinalWithPaginationType,
   OutPutPaginationType,
 } from '../../blogs/types/blog.types';
-import { outPutPaginationUserMapper } from '../mappers/user.mappers';
+import {
+  outPutPaginationUserMapper,
+  outPutUserMapper,
+} from '../mappers/user.mappers';
 import { valuesMakerWithSearchLoginAndEmail } from '../../common/mappers/common.mappers';
+import {
+  InPutPaginationWithSearchLoginTermAndSearchEMailTerm,
+  UserOutPut,
+} from '../types/users.types';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -59,28 +65,3 @@ export class UsersQueryRepository {
     return outPutUserMapper(foundedUser);
   }
 }
-
-export const outPutUserMapper = (user: UserDocument): UserOutPut => {
-  return {
-    id: user._id.toString(),
-    login: user.login,
-    email: user.email,
-    createdAt: user.createdAt.toISOString(),
-  };
-};
-
-export type UserOutPut = {
-  id: string;
-  login: string;
-  email: string;
-  createdAt: string;
-};
-
-export type InPutPaginationWithSearchLoginTermAndSearchEMailTerm = {
-  sortBy?: string;
-  sortDirection?: SortDirection;
-  pageNumber?: string;
-  pageSize?: string;
-  searchLoginTerm?: string;
-  searchEmailTerm?: string;
-};

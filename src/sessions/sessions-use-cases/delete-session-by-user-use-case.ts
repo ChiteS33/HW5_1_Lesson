@@ -21,10 +21,8 @@ export class DeleteSessionByDeviceIdUseCase implements ICommandHandler<DeleteSes
     @Inject(SessionsRepository) private sessionsRepository: SessionsRepository,
   ) {}
 
-  async execute(command: DeleteSessionByDeviceIdCommand) {
-    const payloadRefreshToken = await this.jwtAdapter.decodeJWT(
-      command.refreshToken,
-    );
+  async execute(command: DeleteSessionByDeviceIdCommand): Promise<void> {
+    const payloadRefreshToken = this.jwtAdapter.decodeJWT(command.refreshToken);
 
     const foundSession = await this.sessionService.findSessionByDeviceId(
       command.deviceId,

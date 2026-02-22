@@ -8,16 +8,17 @@ import { Response } from 'express';
 
 @Catch(HttpException)
 export class AllHttpExceptionsFilter implements ExceptionFilter {
-  catch(exception: any, host: ArgumentsHost): any {
+  catch(exception: HttpException, host: ArgumentsHost): any {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const status = exception.getStatus();
+    console.log(exception.getResponse());
     if (status === 400) {
       const errorsMessages: any = [];
       const responseBody: any = exception.getResponse();
 
       if (Array.isArray(responseBody.message)) {
-        responseBody.message.forEach((m: any) => errorsMessages.push(m));
+        responseBody.message.forEach((m) => errorsMessages.push(m));
         return response.status(status).json({ errorsMessages: errorsMessages });
       }
     }
@@ -26,14 +27,14 @@ export class AllHttpExceptionsFilter implements ExceptionFilter {
       return response.status(status).json({
         errorsMessages: [
           {
-            field: 'token',
-            message: 'Unauthorizeddasdasdsdads',
+            field: 'Token',
+            message: 'Unauthorize',
           },
         ],
       });
     }
     return response
       .status(status)
-      .json({ statusCode: status.code, meta: 'AllExceptionFilter' });
+      .json({ statusCode: status, meta: 'AllExceptionFilter' }); //status.code
   }
 }

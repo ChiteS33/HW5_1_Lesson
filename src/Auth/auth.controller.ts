@@ -31,7 +31,7 @@ import { LogoutCommand } from './auth-use-cases/logout-use-case';
 import { RefreshTokensCommand } from './auth-use-cases/refresh-tokens-use-case';
 import { JwtRefreshGuard } from '../core/guards/refreshTokenGuard';
 import { ThrottlerGuard } from '@nestjs/throttler';
-import { PairTokens } from './types/auth.types';
+import { OutPutInfoAboutMe, PairTokens } from './types/auth.types';
 
 @Controller('auth')
 export class AuthController {
@@ -126,7 +126,9 @@ export class AuthController {
   @UseGuards(BearerGuard)
   @HttpCode(HttpStatus.OK)
   @Get('me')
-  infoAboutMe(@Req() req: Request & { user: UserDocument }) {
-    return this.commandBus.execute(new GetInfoAboutUserCommand(req.user));
+  async infoAboutMe(
+    @Req() req: Request & { user: UserDocument },
+  ): Promise<OutPutInfoAboutMe> {
+    return await this.commandBus.execute(new GetInfoAboutUserCommand(req.user));
   }
 }

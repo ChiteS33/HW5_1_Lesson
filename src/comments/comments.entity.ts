@@ -6,18 +6,6 @@ import { LikeDislikeStatus } from '../posts/posts.entity';
 
 export type CommentDocument = HydratedDocument<CommentModel>;
 
-export type CommentInputDto = {
-  content: string;
-  commentatorInfo: CommentatorInfo;
-  createdAt: Date;
-  likesInfo: LikesInfo;
-};
-
-export enum MyStatus {
-  none = 'None',
-  like = 'Like',
-  dislike = 'Dislike',
-}
 export class ContentInputDto {
   @IsStringWithTrim(20, 300)
   content: string;

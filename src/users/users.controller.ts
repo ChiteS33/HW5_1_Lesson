@@ -18,6 +18,8 @@ import { CommandBus } from '@nestjs/cqrs';
 import { DeleteUserCommand } from './user-use-cases/delete-user-use-case';
 import { BasicAuthGuard } from '../core/guards/basic-auth-guard.service';
 import { InPutPaginationWithSearchLoginTermAndSearchEMailTerm } from './validation/users.validation';
+import { FinalWithPaginationType } from '../blogs/types/blog.types';
+import { UserOutPut } from './types/users.types';
 
 @Controller(`users`)
 export class UsersController {
@@ -32,7 +34,7 @@ export class UsersController {
   @Get()
   async getAllUsers(
     @Query() query: InPutPaginationWithSearchLoginTermAndSearchEMailTerm,
-  ) {
+  ): Promise<FinalWithPaginationType<UserOutPut>> {
     return this.usersQueryRepository.getAllUsers(query);
   }
 
@@ -40,11 +42,9 @@ export class UsersController {
   @HttpCode(HttpStatus.CREATED)
   @Post()
   async createUser(@Body() userInputDto: UserInputDto) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const createdUserId = await this.commandBus.execute(
+    const createdUserId: string = await this.commandBus.execute(
       new CreateUserCommand(userInputDto),
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return this.usersQueryRepository.findUserByUserId(createdUserId);
   }
 
@@ -52,7 +52,6 @@ export class UsersController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(`:id`)
   async deleteUser(@Param('id') userId: string) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return this.commandBus.execute(new DeleteUserCommand(userId));
+    await this.commandBus.execute(new DeleteUserCommand(userId));
   }
 }

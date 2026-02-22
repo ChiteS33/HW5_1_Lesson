@@ -30,6 +30,8 @@ import { BearerGuard } from '../core/guards/jwt-auth.guard';
 import { BasicAuthGuard } from '../core/guards/basic-auth-guard.service';
 import { OptionalBearerGuard } from '../core/guards/optional-bearer-guard.service';
 import { InPutLikeStatusValidation } from '../comments/validation/comments.validation';
+import { FinalWithPaginationType } from '../blogs/types/blog.types';
+import { PostOutPutType } from './types/posts.types';
 
 @Controller('posts')
 export class PostsController {
@@ -95,7 +97,7 @@ export class PostsController {
   async getAllPosts(
     @Query() query: InputPaginationType,
     @Req() req: Request & { user: UserDocument },
-  ) {
+  ): Promise<FinalWithPaginationType<PostOutPutType>> {
     const userId = req.user?._id?.toString();
     return this.postsQueryRepository.findAllPosts(query, userId);
   }

@@ -18,10 +18,8 @@ export class LogoutUseCase implements ICommandHandler<LogoutCommand> {
   ) {}
 
   async execute(command: LogoutCommand): Promise<void> {
-    await this.jwtAdapter.verifyRefreshToken(command.refreshToken);
-    const payloadRefreshToken = await this.jwtAdapter.decodeJWT(
-      command.refreshToken,
-    );
+    this.jwtAdapter.verifyRefreshToken(command.refreshToken);
+    const payloadRefreshToken = this.jwtAdapter.decodeJWT(command.refreshToken);
     const foundSession =
       await this.sessionsRepository.findSessionByUserIdAndDeviceId(
         payloadRefreshToken.userId,

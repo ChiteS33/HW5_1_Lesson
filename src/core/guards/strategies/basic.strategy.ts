@@ -11,7 +11,7 @@ export class BasicStrategy extends PassportStrategy(Strategy) {
     super();
   }
 
-  public validate = (username, password): boolean => {
+  public validate = (username: string, password: string): boolean => {
     if (
       basicConstants.userName === username &&
       basicConstants.password === password
