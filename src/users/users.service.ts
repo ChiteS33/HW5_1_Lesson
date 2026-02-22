@@ -27,49 +27,12 @@ export class UsersService {
     return foundedUser;
   }
 
-  // async createUser(inputDto: UserInputDto): Promise<string> {
-  //   const foundedUserByLogin = await this.usersRepository.findUserByLogin(
-  //     inputDto.login,
-  //   );
-  //   if (foundedUserByLogin)
-  //     throw new DomainException({
-  //       code: DomainExceptionCode.Unauthorized,
-  //       field: 'login',
-  //       message: 'Login now is using',
-  //     });
-  //   const foundedUserByEmail = await this.usersRepository.findUserByEmail(
-  //     inputDto.email,
-  //   );
-  //   if (foundedUserByEmail) {
-  //     throw new DomainException({
-  //       code: DomainExceptionCode.BadRequest,
-  //       field: 'email',
-  //       message: 'Email already in use',
-  //     });
-  //   }
-  //   const hash = await this.bcryptService.hashMake(inputDto.password);
-  //
-  //   const createDto = {
-  //     login: inputDto.login,
-  //     email: inputDto.email,
-  //     passwordHash: hash,
-  //   };
-  //   const createdUser = this.userModel.createUserByAdmin(createDto);
-  //   return await this.usersRepository.save(createdUser);
-  // }
-
-  // async deleteUser(userId: string): Promise<void> {
-  //   await this.findUserById(userId);
-  //   await this.usersRepository.deleteUserById(userId);
-  //   return;
-  // }
-
   async findUserByLoginOrEmail(loginOrEmail: string): Promise<UserDocument> {
     const foundedUser =
       await this.usersRepository.findUserByLoginOrEmail(loginOrEmail);
     if (!foundedUser) {
       throw new DomainException({
-        code: DomainExceptionCode.NotFound,
+        code: DomainExceptionCode.Unauthorized,
         field: 'loginOrEmail',
         message: 'User not found',
       });

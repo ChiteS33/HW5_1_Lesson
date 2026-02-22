@@ -33,6 +33,7 @@ export class DomainHttpExceptionsFilter implements ExceptionFilter {
       case DomainExceptionCode.NotFound:
         return HttpStatus.NOT_FOUND;
       case DomainExceptionCode.Unauthorized:
+      case DomainExceptionCode.RefreshTokenExpired:
         return HttpStatus.UNAUTHORIZED;
       case DomainExceptionCode.InternalServerError:
         return HttpStatus.INTERNAL_SERVER_ERROR;

@@ -24,7 +24,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     });
     if (!user) {
       throw new DomainException({
-        code: DomainExceptionCode.NotFound,
+        code: DomainExceptionCode.Unauthorized,
         field: 'loginOrEmail or password',
         message: 'Invalid loginOrEmail or password',
       });

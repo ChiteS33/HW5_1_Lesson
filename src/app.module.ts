@@ -66,6 +66,17 @@ import { JwtStrategy } from './core/guards/strategies/jwt.strategy';
 import { BcryptService } from './core/adapters/bcryptAdapter/bcrypt.service';
 import { EmailAdapter } from './core/adapters/emailAdapter/email-adapter';
 import { settings } from './core/guards/strategies/constants';
+import { SessionSchema, SessionsModel } from './sessions/sessions.entity';
+import { SessionsRepository } from './sessions/repostiory/sessions.repository';
+import { SessionsController } from './sessions/sessions.controller';
+import { FindAllUsersUseCase } from './sessions/sessions-use-cases/find-sessions-use-case';
+import { DeleteAllExcludeUserUseCase } from './sessions/sessions-use-cases/delete-all-exclude-user-use-case';
+import { SessionsService } from './sessions/sessions.service';
+import { DeleteSessionByDeviceIdUseCase } from './sessions/sessions-use-cases/delete-session-by-user-use-case';
+import { LogoutUseCase } from './Auth/auth-use-cases/logout-use-case';
+import { RefreshTokensUseCase } from './Auth/auth-use-cases/refresh-tokens-use-case';
+import { JwtRefreshStrategy } from './core/guards/strategies/refreshToken.strategy';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 const services = [
   UsersService,
@@ -73,6 +84,7 @@ const services = [
   PostService,
   CommentsService,
   AuthService,
+  SessionsService,
 ];
 const repositories = [
   UsersRepository,
@@ -81,12 +93,18 @@ const repositories = [
   CommentsRepository,
   LikesForPostRepository,
   LikesForCommentRepository,
+  SessionsRepository,
 ];
 const queryRepositories = [
   UsersQueryRepository,
   BlogsQueryRepository,
   PostsQueryRepository,
   CommentsQueryRepository,
+];
+const sessionUseCases = [
+  FindAllUsersUseCase,
+  DeleteAllExcludeUserUseCase,
+  DeleteSessionByDeviceIdUseCase,
 ];
 const userUseCases = [CreateUserUseCase, DeleteUserUseCase];
 const authUseCases = [
@@ -97,6 +115,8 @@ const authUseCases = [
   RegistrationInSystemUseCase,
   ResendEmailResendingEmailUseCase,
   GetInfoAboutUserUseCase,
+  LogoutUseCase,
+  RefreshTokensUseCase,
 ];
 const blogUseCases = [CreateBlogUseCase, UpdateBlogUseCase, DeleteBlogUseCase];
 const commentsUseCases = [
@@ -119,6 +139,7 @@ const controllers = [
   PostsController,
   CommentsController,
   AuthController,
+  SessionsController,
 ];
 const errorFilters = [
   {
@@ -130,7 +151,12 @@ const errorFilters = [
     useClass: DomainHttpExceptionsFilter,
   },
 ];
-const errorStrategies = [LocalStrategy, BasicStrategy, JwtStrategy];
+const errorStrategies = [
+  LocalStrategy,
+  BasicStrategy,
+  JwtStrategy,
+  JwtRefreshStrategy,
+];
 const schemas = [
   {
     name: UserModel.name,
@@ -156,6 +182,10 @@ const schemas = [
     name: LikeForCommentsModel.name,
     schema: LikeForCommentSchema,
   },
+  {
+    name: SessionsModel.name,
+    schema: SessionSchema,
+  },
 ];
 
 @Module({
@@ -168,7 +198,15 @@ const schemas = [
     }),
     MongooseModule.forRoot('mongodb://localhost:27017/Grecha'),
     MongooseModule.forFeature([...schemas]),
+
+    ThrottlerModule.forRoot([
+      {
+        ttl: 10000,
+        limit: 5,
+      },
+    ]),
   ],
+
   controllers: controllers,
   providers: [
     ...services,
@@ -182,6 +220,7 @@ const schemas = [
     ...blogUseCases,
     ...commentsUseCases,
     ...postsUseCases,
+    ...sessionUseCases,
   ],
 })
 export class AppModule {}

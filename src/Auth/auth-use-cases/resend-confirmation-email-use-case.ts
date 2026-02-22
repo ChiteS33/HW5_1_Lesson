@@ -36,7 +36,7 @@ export class ResendEmailResendingEmailUseCase implements ICommandHandler<ResendE
     }
     foundUser.refreshConfirmationCode();
     await this.usersRepository.save(foundUser);
-    await this.emailAdapter.sendEmail(
+    this.emailAdapter.sendEmail(
       foundUser.email,
       'ChiteS',
       foundUser.emailConfirmation.confirmationCode!,

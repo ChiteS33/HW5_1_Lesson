@@ -123,4 +123,9 @@ export class BlogsController {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return this.commandBus.execute(new DeleteBlogCommand(blogId));
   }
+
+  @Get('s')
+  kek() {
+    return 'kekwek';
+  }
 }

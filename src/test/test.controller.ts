@@ -16,6 +16,7 @@ export class DeleteAllController {
       'commentmodels',
       'likeforpostmodels',
       'likeforcommentsmodels',
+      'sessionsmodels',
     ];
     for (const name of collectionsToClear) {
       const collection = this.connection.collections[name];

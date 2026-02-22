@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { add } from 'date-fns';
-import { Matches } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, Matches } from 'class-validator';
 import { IsStringWithTrim } from '../core/decorators/validation/is-string-with-trim';
 
 export type UserDocument = HydratedDocument<UserModel>;
@@ -11,6 +11,13 @@ export type UserInputDtoForCreate = {
   email: string;
   passwordHash: string;
 };
+
+export class RefreshTokenDto {
+  @IsString()
+  @IsNotEmpty()
+  // @Matches(/^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/)
+  refreshToken: string;
+}
 
 export class UserInputDto {
   @IsStringWithTrim(3, 10)

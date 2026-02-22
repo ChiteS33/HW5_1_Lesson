@@ -26,7 +26,7 @@ export class RegistrationInSystemUseCase implements ICommandHandler<Registration
     await this.usersService.findUserByEmail(command.body.email);
     const createdUser = UserModel.createUser(command.body, passwordHash);
     await this.usersRepository.save(createdUser);
-    await this.emailAdapter.sendEmail(
+    this.emailAdapter.sendEmail(
       command.body.email,
       'Chites',
       createdUser.emailConfirmation.confirmationCode!,

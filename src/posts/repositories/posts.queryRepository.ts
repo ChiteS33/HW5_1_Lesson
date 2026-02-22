@@ -66,7 +66,6 @@ export class PostsQueryRepository {
     postId: string,
     userId?: string,
   ): Promise<PostOutPutType> {
-    console.log(userId);
     const totalCountLike = await this.likeModel.countDocuments({
       postId: postId,
       status: 'Like',
