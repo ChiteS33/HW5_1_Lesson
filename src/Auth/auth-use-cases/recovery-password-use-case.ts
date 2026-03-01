@@ -4,7 +4,7 @@ import { DomainExceptionCode } from '../../core/exceptions/domain-exception-code
 import { UsersRepository } from '../../users/repositories/users.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { EmailAdapter } from '../../core/adapters/emailAdapter/email-adapter';
-import { UserDocument } from '../../users/users.entity';
+import { UserInDB } from '../../users/types/users.types';
 
 export class RecoveryPasswordCommand {
   constructor(public email: string) {}
@@ -18,7 +18,7 @@ export class RecoveryPasswordUseCase implements ICommandHandler<RecoveryPassword
   ) {}
 
   async execute(command: RecoveryPasswordCommand): Promise<void> {
-    const foundUser: UserDocument | null =
+    const foundUser: UserInDB | null =
       await this.usersRepository.findUserByLoginOrEmail(command.email);
     if (!foundUser) {
       throw new DomainException({
@@ -27,12 +27,9 @@ export class RecoveryPasswordUseCase implements ICommandHandler<RecoveryPassword
         message: 'Invalid email',
       });
     }
-    foundUser.recoveryCode();
-    await this.usersRepository.save(foundUser);
-    await this.emailAdapter.resendEmail(
-      command.email,
-      foundUser.recoveryData.recoveryCode!,
-    );
+    const recoveryCode = crypto.randomUUID();
+    await this.usersRepository.updateRecoveryCode(foundUser.id, recoveryCode);
+    await this.emailAdapter.resendEmail(command.email, recoveryCode);
     return;
   }
 }

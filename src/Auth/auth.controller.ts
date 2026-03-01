@@ -52,6 +52,7 @@ export class AuthController {
       new ConfirmPasswordRecoveryCommand(dto.newPassword, dto.recoveryCode),
     );
   }
+
   @UseGuards(ThrottlerGuard, LocalGuard)
   @HttpCode(HttpStatus.OK)
   @Post('login')
@@ -76,6 +77,7 @@ export class AuthController {
     });
     return { accessToken: tokens.accessToken };
   }
+
   @UseGuards(JwtRefreshGuard)
   @HttpCode(HttpStatus.OK)
   @Post('refresh-token')
@@ -91,22 +93,25 @@ export class AuthController {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
-      maxAge: 20 * 10000,
+      maxAge: 20 * 100000,
     });
     return { accessToken: tokens.accessToken };
   }
+
   @UseGuards(ThrottlerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-confirmation')
   async confirmRegistration(@Body() dto: InputValidationCode) {
     await this.commandBus.execute(new ConfirmRegistrationCommand(dto.code));
   }
+
   @UseGuards(ThrottlerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration')
   async registrationInSystem(@Body() dto: UserInputDto) {
     await this.commandBus.execute(new RegistrationInSystemCommand(dto));
   }
+
   @UseGuards(ThrottlerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-email-resending')
@@ -115,6 +120,7 @@ export class AuthController {
       new ResendEmailResendingEmailCommand(dto.email),
     );
   }
+
   @UseGuards(JwtRefreshGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('logout')
@@ -123,6 +129,7 @@ export class AuthController {
     await this.commandBus.execute(new LogoutCommand(refreshToken));
     return;
   }
+
   @UseGuards(BearerGuard)
   @HttpCode(HttpStatus.OK)
   @Get('me')

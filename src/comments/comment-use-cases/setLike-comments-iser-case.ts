@@ -28,7 +28,6 @@ export class SetLikeCommentsUseCase implements ICommandHandler<SetLikeCommentsCo
     private likeForCommentsModel: LikeForCommentsModelI,
   ) {}
   async execute(command: SetLikeCommentsCommand): Promise<void> {
-    console.log(command);
     await this.commentsService.findCommentById(command.commentId);
     const foundCommentLike =
       await this.likesForCommentRepository.findLikeByUserIdAndCommentId(

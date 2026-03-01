@@ -1,10 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UsersRepository } from './repositories/users.repository';
-import { UserDocument, UserModel, UserModelI } from './users.entity';
+import { UserModel, UserModelI } from './users.entity';
 import { DomainException } from '../core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '../core/exceptions/domain-exception-codes';
 import { BcryptService } from '../core/adapters/bcryptAdapter/bcrypt.service';
+import { UserInDB } from './types/users.types';
 
 @Injectable()
 export class UsersService {
@@ -15,8 +16,9 @@ export class UsersService {
     @Inject(BcryptService) private bcryptService: BcryptService,
   ) {}
 
-  async findUserById(userId: string): Promise<UserDocument> {
-    const foundedUser = await this.usersRepository.findUserById(userId);
+  async findUserById(userId: string): Promise<UserInDB> {
+    const foundedUser: UserInDB | null =
+      await this.usersRepository.findUserById(userId);
     if (!foundedUser) {
       throw new DomainException({
         code: DomainExceptionCode.NotFound,
@@ -27,8 +29,8 @@ export class UsersService {
     return foundedUser;
   }
 
-  async findUserByLoginOrEmail(loginOrEmail: string): Promise<UserDocument> {
-    const foundedUser =
+  async findUserByLoginOrEmail(loginOrEmail: string): Promise<UserInDB> {
+    const foundedUser: UserInDB | null =
       await this.usersRepository.findUserByLoginOrEmail(loginOrEmail);
     if (!foundedUser) {
       throw new DomainException({

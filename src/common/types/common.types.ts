@@ -15,3 +15,11 @@ export type Payload = {
   iat: number;
   exp: number;
 };
+
+export type TotalCount = {
+  count: number;
+};
+
+export type Id = {
+  id: number;
+};

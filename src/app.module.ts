@@ -77,6 +77,7 @@ import { LogoutUseCase } from './Auth/auth-use-cases/logout-use-case';
 import { RefreshTokensUseCase } from './Auth/auth-use-cases/refresh-tokens-use-case';
 import { JwtRefreshStrategy } from './core/guards/strategies/refreshToken.strategy';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 const services = [
   UsersService,
@@ -190,6 +191,16 @@ const schemas = [
 
 @Module({
   imports: [
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: 'postgres',
+      password: 'postgres',
+      database: 'postgres',
+      autoLoadEntities: false,
+      synchronize: false,
+    }),
     CqrsModule,
     PassportModule,
     JwtModule.register({

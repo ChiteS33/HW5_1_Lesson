@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { settings } from './constants';
 import { UsersRepository } from '../../../users/repositories/users.repository';
-import { UserDocument } from '../../../users/users.entity';
+import { UserInDB } from '../../../users/types/users.types';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -21,11 +21,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     userId: string;
     iat: number;
     exp: number;
-  }): Promise<UserDocument | null> {
+  }): Promise<UserInDB | null> {
     if (!payload) {
       return null;
     }
-    const foundedUser: UserDocument | null =
+    const foundedUser: UserInDB | null =
       await this.usersRepository.findUserById(payload.userId);
     if (!foundedUser) {
       return null;

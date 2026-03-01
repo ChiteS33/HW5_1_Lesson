@@ -33,7 +33,7 @@ export class LogoutUseCase implements ICommandHandler<LogoutCommand> {
       });
     }
     await this.sessionsRepository.deleteSessionByDeviceId(
-      foundSession.deviceId,
+      foundSession.deviceId.toString(),
     );
     return;
   }

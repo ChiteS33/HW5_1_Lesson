@@ -10,10 +10,10 @@ export class GetInfoAboutUserCommand {
 export class GetInfoAboutUserUseCase implements ICommandHandler<GetInfoAboutUserCommand> {
   constructor() {}
   async execute(command: GetInfoAboutUserCommand): Promise<OutPutInfoAboutMe> {
-    return Promise.resolve({
+      return Promise.resolve({
       email: command.user.email,
       login: command.user.login,
-      userId: command.user._id.toString(),
+      userId: command.user.id.toString(),
     });
   }
 }

@@ -3,6 +3,7 @@ import { DomainException } from '../../core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '../../core/exceptions/domain-exception-codes';
 import { UsersRepository } from '../../users/repositories/users.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { UserInDB } from '../../users/types/users.types';
 
 export class ConfirmRegistrationCommand {
   constructor(public code: string) {}
@@ -14,9 +15,8 @@ export class ConfirmRegistrationUseCase implements ICommandHandler<ConfirmRegist
     @Inject(UsersRepository) private usersRepository: UsersRepository,
   ) {}
   async execute(command: ConfirmRegistrationCommand): Promise<void> {
-    const foundUser = await this.usersRepository.findUserByConfirmationCode(
-      command.code,
-    );
+    const foundUser: UserInDB | null =
+      await this.usersRepository.findUserByConfirmationCode(command.code);
     if (!foundUser) {
       throw new DomainException({
         code: DomainExceptionCode.BadRequest,
@@ -24,32 +24,32 @@ export class ConfirmRegistrationUseCase implements ICommandHandler<ConfirmRegist
         message: 'Invalid confirmation code',
       });
     }
-    if (foundUser.emailConfirmation.isConfirmed) {
+
+    if (foundUser.isConfirmed) {
       throw new DomainException({
         code: DomainExceptionCode.BadRequest,
         field: 'code',
         message: 'User is confirmed',
       });
     }
-    if (foundUser.emailConfirmation.confirmationCode !== command.code) {
+    if (foundUser.confirmationCode !== command.code) {
       throw new DomainException({
         code: DomainExceptionCode.Unauthorized,
         field: 'confirmationCode',
         message: 'Confirmation Code does not match',
       });
     }
-    if (
-      !foundUser.emailConfirmation.expirationDate ||
-      foundUser.emailConfirmation.expirationDate < new Date()
-    ) {
+    if (!foundUser.expirationDate || foundUser.expirationDate < new Date()) {
       throw new DomainException({
         code: DomainExceptionCode.BadRequest,
         field: 'confirmationCode',
         message: 'Confirmation expired',
       });
     }
-    foundUser.changeConfirmationStatus(true);
-    await this.usersRepository.save(foundUser);
+
+    const status = true;
+    await this.usersRepository.changeConfirmationStatus(status, foundUser.id);
+
     return;
   }
 }

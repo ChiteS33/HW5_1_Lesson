@@ -23,6 +23,7 @@ export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
     const foundedUserByLogin = await this.usersRepository.findUserByLogin(
       command.inputDto.login,
     );
+
     if (foundedUserByLogin)
       throw new DomainException({
         code: DomainExceptionCode.Unauthorized,
@@ -32,6 +33,7 @@ export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
     const foundedUserByEmail = await this.usersRepository.findUserByEmail(
       command.inputDto.email,
     );
+
     if (foundedUserByEmail) {
       throw new DomainException({
         code: DomainExceptionCode.BadRequest,
@@ -41,13 +43,10 @@ export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
     }
     const hash = await this.bcryptService.hashMake(command.inputDto.password);
 
-    const createDto = {
-      login: command.inputDto.login,
-      email: command.inputDto.email,
-      passwordHash: hash,
-    };
-
-    const createdUser = this.userModel.createUserByAdmin(createDto);
-    return await this.usersRepository.save(createdUser);
+    return await this.usersRepository.saveUserByAdmin(
+      command.inputDto.login,
+      command.inputDto.email,
+      hash,
+    );
   }
 }

@@ -6,6 +6,7 @@ import { DomainException } from '../../core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '../../core/exceptions/domain-exception-codes';
 import { Payload } from '../../common/types/common.types';
 import { PairTokens } from '../types/auth.types';
+import { SessionInDb } from '../../sessions/types/output-dto';
 
 export class RefreshTokensCommand {
   constructor(public refreshToken: string) {}
@@ -27,11 +28,12 @@ export class RefreshTokensUseCase implements ICommandHandler<RefreshTokensComman
       payloadRefreshToken.deviceId,
     );
     const newPayload = this.jwtAdapter.decodeJWT(refreshToken);
-    const newIat = newPayload.iat;
-    const newExp = newPayload.exp;
-    const foundSession = await this.sessionsRepository.findSessionByDeviceId(
-      payloadRefreshToken.deviceId,
-    );
+    const newIat = new Date(newPayload.iat * 1000).toISOString();
+    const newExp = new Date(newPayload.exp * 1000).toISOString();
+    const foundSession: SessionInDb | null =
+      await this.sessionsRepository.findSessionByDeviceId(
+        payloadRefreshToken.deviceId,
+      );
     if (!foundSession) {
       throw new DomainException({
         code: DomainExceptionCode.NotFound,
@@ -40,8 +42,11 @@ export class RefreshTokensUseCase implements ICommandHandler<RefreshTokensComman
       });
     }
 
-    foundSession.updateSession(newIat, newExp);
-    await this.sessionsRepository.save(foundSession);
+    await this.sessionsRepository.updateSession(
+      foundSession.id,
+      newIat,
+      newExp,
+    );
     return { accessToken, refreshToken };
   }
 }

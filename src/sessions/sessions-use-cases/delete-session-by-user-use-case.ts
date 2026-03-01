@@ -5,6 +5,7 @@ import { SessionsService } from '../sessions.service';
 import { DomainException } from '../../core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '../../core/exceptions/domain-exception-codes';
 import { SessionsRepository } from '../repostiory/sessions.repository';
+import { SessionInDb } from '../types/output-dto';
 
 export class DeleteSessionByDeviceIdCommand {
   constructor(
@@ -24,10 +25,9 @@ export class DeleteSessionByDeviceIdUseCase implements ICommandHandler<DeleteSes
   async execute(command: DeleteSessionByDeviceIdCommand): Promise<void> {
     const payloadRefreshToken = this.jwtAdapter.decodeJWT(command.refreshToken);
 
-    const foundSession = await this.sessionService.findSessionByDeviceId(
-      command.deviceId,
-    );
-    console.log(foundSession);
+    const foundSession: SessionInDb =
+      await this.sessionService.findSessionByDeviceId(command.deviceId);
+
     if (!foundSession) {
       throw new DomainException({
         code: DomainExceptionCode.NotFound,
@@ -35,7 +35,7 @@ export class DeleteSessionByDeviceIdUseCase implements ICommandHandler<DeleteSes
         message: 'Session not found.',
       });
     }
-    if (foundSession.userId !== payloadRefreshToken.userId) {
+    if (foundSession.userId.toString() !== payloadRefreshToken.userId) {
       throw new DomainException({
         code: DomainExceptionCode.Forbidden,
         field: 'refreshToken',

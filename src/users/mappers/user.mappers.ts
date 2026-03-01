@@ -2,8 +2,7 @@ import {
   FinalWithPaginationType,
   OutPutPaginationType,
 } from '../../blogs/types/blog.types';
-import { UserOutPut } from '../types/users.types';
-import { UserDocument } from '../users.entity';
+import { UserInPut, UserOutPut } from '../types/users.types';
 
 export const outPutPaginationUserMapper = (
   dto: UserOutPut[],
@@ -18,9 +17,9 @@ export const outPutPaginationUserMapper = (
   };
 };
 
-export const outPutUserMapper = (user: UserDocument): UserOutPut => {
+export const outPutUserMapper = (user: UserInPut): UserOutPut => {
   return {
-    id: user._id.toString(),
+    id: user.id.toString(),
     login: user.login,
     email: user.email,
     createdAt: user.createdAt.toISOString(),

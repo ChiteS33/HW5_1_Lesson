@@ -21,7 +21,7 @@ import { InPutPaginationWithSearchLoginTermAndSearchEMailTerm } from './validati
 import { FinalWithPaginationType } from '../blogs/types/blog.types';
 import { UserOutPut } from './types/users.types';
 
-@Controller(`users`)
+@Controller(`sa/users`)
 export class UsersController {
   constructor(
     private commandBus: CommandBus,

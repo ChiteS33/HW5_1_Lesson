@@ -1,13 +1,10 @@
-import { SessionsDocument } from '../sessions.entity';
-import { OutPutSessionDTO } from '../types/output-dto';
+import { SessionInDb, SessionOutPut } from '../types/output-dto';
 
-export const outPutSessionMapper = (
-  dto: SessionsDocument,
-): OutPutSessionDTO => {
+export const outPutSessionMapper = (dto: SessionInDb): SessionOutPut => {
   return {
-    ip: dto._id.toString(),
+    ip: dto.id.toString(),
     title: dto.deviceName,
     lastActiveDate: dto.iat,
-    deviceId: dto.deviceId,
+    deviceId: dto.deviceId.toString(),
   };
 };

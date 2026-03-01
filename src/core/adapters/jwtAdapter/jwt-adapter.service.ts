@@ -21,7 +21,7 @@ export class JwtAdapter {
     deviceId: string = new ObjectId().toString(),
   ): string {
     const payload = { userId: userId, deviceId: deviceId };
-    return jwt.sign(payload, settings.JWT_REFRESH_TOKEN, { expiresIn: '20s' });
+    return jwt.sign(payload, settings.JWT_REFRESH_TOKEN, { expiresIn: '5m' });
   }
 
   verifyRefreshToken(token: string): Payload {

@@ -8,6 +8,9 @@ export enum SortDirection {
 export class InputPaginationType {
   @IsOptional()
   @IsString()
+  searchNameTerm?: string;
+  @IsOptional()
+  @IsString()
   pageNumber?: string;
   @IsOptional()
   @IsNumber()

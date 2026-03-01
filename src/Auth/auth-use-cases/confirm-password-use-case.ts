@@ -4,6 +4,7 @@ import { DomainException } from '../../core/exceptions/domain-exceptions';
 import { UsersRepository } from '../../users/repositories/users.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BcryptService } from '../../core/adapters/bcryptAdapter/bcrypt.service';
+import { UserInDB } from '../../users/types/users.types';
 
 export class ConfirmPasswordRecoveryCommand {
   constructor(
@@ -20,9 +21,8 @@ export class ConfirmPasswordRecoveryUseCase implements ICommandHandler<ConfirmPa
   ) {}
 
   async execute(command: ConfirmPasswordRecoveryCommand): Promise<void> {
-    const foundUser = await this.usersRepository.findUserByRecoveryCode(
-      command.recoveryCode,
-    );
+    const foundUser: UserInDB | null =
+      await this.usersRepository.findUserByRecoveryCode(command.recoveryCode);
     if (!foundUser) {
       throw new DomainException({
         code: DomainExceptionCode.Unauthorized,
@@ -30,10 +30,8 @@ export class ConfirmPasswordRecoveryUseCase implements ICommandHandler<ConfirmPa
         message: 'Invalid recoveryCode',
       });
     }
-    foundUser.passwordHash = await this.bcryptService.hashMake(
-      command.newPassword,
-    );
-    await this.usersRepository.save(foundUser);
+    const newHash = await this.bcryptService.hashMake(command.newPassword);
+    await this.usersRepository.updatePassword(foundUser.id, newHash);
     return;
   }
 }

@@ -12,7 +12,7 @@ export class AllHttpExceptionsFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const status = exception.getStatus();
-    console.log(exception.getResponse());
+
     if (status === 400) {
       const errorsMessages: any = [];
       const responseBody: any = exception.getResponse();

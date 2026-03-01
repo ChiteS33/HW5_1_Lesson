@@ -1,6 +1,6 @@
 import { Inject } from '@nestjs/common';
 import { UsersRepository } from '../../users/repositories/users.repository';
-import { UserInputDto, UserModel } from '../../users/users.entity';
+import { UserInputDto } from '../../users/users.entity';
 import { UsersService } from '../../users/users.service';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { EmailAdapter } from '../../core/adapters/emailAdapter/email-adapter';
@@ -24,12 +24,20 @@ export class RegistrationInSystemUseCase implements ICommandHandler<Registration
     );
     await this.usersService.findUserByLogin(command.body.login);
     await this.usersService.findUserByEmail(command.body.email);
-    const createdUser = UserModel.createUser(command.body, passwordHash);
-    await this.usersRepository.save(createdUser);
+
+    const createdUserId = await this.usersRepository.saveUser(
+      command.body,
+      passwordHash,
+    );
+
+    const createdUser = await this.usersService.findUserById(
+      createdUserId.toString(),
+    );
+
     this.emailAdapter.sendEmail(
       command.body.email,
       'Chites',
-      createdUser.emailConfirmation.confirmationCode!,
+      createdUser.confirmationCode,
     );
     return;
   }

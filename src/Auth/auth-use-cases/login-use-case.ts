@@ -30,17 +30,16 @@ export class LoginUseCase implements ICommandHandler<LoginUseCommand> {
     command: LoginUseCommand,
   ): Promise<{ accessToken: string; refreshToken: string }> {
     await this.authService.checkingUser(command.body);
-    const userId = command.user._id.toString();
+    const userId = command.user.id.toString();
     const accessToken = this.jwtService.createJWT(userId);
     const refreshToken = this.jwtService.createRefreshToken(userId);
     const payload: Payload = this.jwtService.decodeJWT(refreshToken);
-
-    const createdSession = this.sessionsModel.createSession(
+    await this.sessionsRepository.createSession(
       payload,
       command.sessionIp,
       command.deviceName,
     );
-    await this.sessionsRepository.save(createdSession);
+
     return { accessToken, refreshToken };
   }
 }
