@@ -132,6 +132,9 @@ importers:
       '@types/passport':
         specifier: ^1.0.17
         version: 1.0.17
+      '@types/passport-http':
+        specifier: ^0.3.11
+        version: 0.3.11
       '@types/passport-jwt':
         specifier: ^4.0.1
         version: 4.0.1
@@ -1279,6 +1282,9 @@ packages:
 
   '@types/nodemailer@7.0.5':
     resolution: {integrity: sha512-7WtR4MFJUNN2UFy0NIowBRJswj5KXjXDhlZY43Hmots5eGu5q/dTeFd/I6GgJA/qj3RqO6dDy4SvfcV3fOVeIA==}
+
+  '@types/passport-http@0.3.11':
+    resolution: {integrity: sha512-FO0rDRYtuha9m2ZgRx5+jrgrrkAnUzgzdItFI0dwKBC6k9pArK677Gtan67u6+Qah2nXVP3M1uZ5p90SpBT5Zg==}
 
   '@types/passport-jwt@4.0.1':
     resolution: {integrity: sha512-Y0Ykz6nWP4jpxgEUYq8NoVZeCQPo1ZndJLfapI249g1jHChvRfZRO/LS3tqu26YgAS/laI1qx98sYGz0IalRXQ==}
@@ -5488,6 +5494,11 @@ snapshots:
       '@types/node': 22.19.3
     transitivePeerDependencies:
       - aws-crt
+
+  '@types/passport-http@0.3.11':
+    dependencies:
+      '@types/express': 5.0.6
+      '@types/passport': 1.0.17
 
   '@types/passport-jwt@4.0.1':
     dependencies:
