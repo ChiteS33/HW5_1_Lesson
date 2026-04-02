@@ -28,7 +28,6 @@ import { DeleteBlogSaUseCase } from './application/use-cases/blogSa-use-cases/de
 import { CreateCommentUseCase } from './application/use-cases/comment-use-cases/create-comment-use-case';
 import { DeleteCommentUseCase } from './application/use-cases/comment-use-cases/delete-comment-use-case';
 import { UpdateCommentUseCase } from './application/use-cases/comment-use-cases/update-comment-use-case';
-import { SetLikeCommentsUseCase } from './application/use-cases/comment-use-cases/setLike-comments-iser-case';
 import { UserAccountsModule } from '../user-accounts/user-accounts.module';
 import { BlogsControllerSa } from './api/blogsSa.controller';
 import { BlogsController } from './api/blogs.controller';
@@ -42,13 +41,17 @@ import { PostsQueryRepository } from './repositories/postsRepositories/posts.que
 import { CommentsQueryRepository } from './repositories/commentsRepositories/comments.queryRepository';
 import { GetAllBlogsQueryHandlers } from './application/query-handlers/blog-query-handlers/get-allBlogs-query-handler';
 import { GetBlogsByBlogIdQueryHandler } from './application/query-handlers/blog-query-handlers/get-blogById-query-handler';
-import { GetAllPostsQueryHandlers } from './application/query-handlers/post-query-handlers/get-allPosts-query-handler';
+import { GetAllPostsQueryHandler } from './application/query-handlers/post-query-handlers/get-allPosts-query-handler';
 import { GetAllBlogsSaQueryHandler } from './application/query-handlers/blogSa-query-handlers/get-allBlogsSa-query-handler';
 import { GetAllPostsByBlogIdSaQueryHandler } from './application/query-handlers/blogSa-query-handlers/get-allPostsByBlogIdSa-query-handler';
 import { GetAllPostsByBlogIdQueryHandler } from './application/query-handlers/blog-query-handlers/get-allPostsByBlogId-query-handler';
 import { CreatePostByBlogIdSaUseCase } from './application/use-cases/blogSa-use-cases/create-post-by-blogId-sa-use-case';
 import { DeletePostByBlogIdSaUseCase } from './application/use-cases/blogSa-use-cases/delete-post-by-blogId-sa-use-case';
 import { UpdatePostByBlogIdSaUseCase } from './application/use-cases/post-use-cases/update-post-by-blog-id-sa-use-case';
+import { SetLikeCommentsUseCase } from './application/use-cases/comment-use-cases/setLike-comments-use-case';
+import { GetCommentByIdQueryHandler } from './application/query-handlers/comment-query-handlers/get-commentById-query-handler';
+import { GetPostByPostIdQueryHandler } from './application/query-handlers/post-query-handlers/get-postById-query-handler';
+import { FindAllCommentsByPostIdQueryHandler } from './application/query-handlers/comment-query-handlers/get-allCommentByPostId-query-handler';
 
 const services = [BlogsService, PostService, CommentsService];
 const repositories = [
@@ -72,7 +75,12 @@ const blogQueryHandlersSa = [
   GetAllBlogsSaQueryHandler,
   GetAllPostsByBlogIdSaQueryHandler,
 ];
-const postQueryHandlers = [GetAllPostsQueryHandlers];
+const commentQueryHandlers = [GetCommentByIdQueryHandler];
+const postQueryHandlers = [
+  GetAllPostsQueryHandler,
+  GetPostByPostIdQueryHandler,
+  FindAllCommentsByPostIdQueryHandler,
+];
 const blogSaUseCases = [
   CreateBlogSaUseCase,
   CreatePostByBlogIdSaUseCase,
@@ -140,6 +148,7 @@ const schemas = [
     ...blogQueryHandlers,
     ...postQueryHandlers,
     ...blogQueryHandlersSa,
+    ...commentQueryHandlers,
   ],
   exports: [],
 })

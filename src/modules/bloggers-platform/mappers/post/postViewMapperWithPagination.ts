@@ -1,11 +1,11 @@
 import { PaginationViewType } from '../../../../core/types/paginationViewType';
 import { FinalViewWithPaginationType } from '../../../../core/types/finalViewWithPagination.type';
-import { PostViewType } from '../../api/view-types/posts/postView.type';
+import { PostViewWithLikesType } from '../../api/view-types/posts/postViewWithLikes.type';
 
 export const postViewWithPagination = (
-  postValue: PostViewType[],
+  postValue: PostViewWithLikesType[],
   paginationValues: PaginationViewType,
-): FinalViewWithPaginationType<PostViewType> => {
+): FinalViewWithPaginationType<PostViewWithLikesType> => {
   return {
     pagesCount: paginationValues.pagesCount,
     page: paginationValues.page,

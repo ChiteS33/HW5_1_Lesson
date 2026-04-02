@@ -5,31 +5,30 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  Inject,
   Param,
   Put,
   Req,
   UseGuards,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { BearerGuard } from '../../user-accounts/guards/bearer/jwt-auth.guard';
 import { UserDocument } from '../../user-accounts/domain/entities/users.entity';
 import { InPutLikeStatusValidation } from '../validation/InPutLikeStatusValidation';
-import { SetLikeCommentsCommand } from '../application/use-cases/comment-use-cases/setLike-comments-iser-case';
 import { ContentInputDto } from '../domain/entities/comments.entity';
 import { UpdateCommentCommand } from '../application/use-cases/comment-use-cases/update-comment-use-case';
 import { DeleteCommentCommand } from '../application/use-cases/comment-use-cases/delete-comment-use-case';
 import { OptionalBearerGuard } from '../../user-accounts/guards/bearer/optional-bearer-guard.service';
-import { CommentsQueryRepository } from '../repositories/commentsRepositories/comments.queryRepository';
+
 import { CommentViewType } from './view-types/comments/commentView.type';
+import { FindCommentByIdQuery } from '../application/query-handlers/comment-query-handlers/get-commentById-query-handler';
+import { SetLikeCommentsCommand } from '../application/use-cases/comment-use-cases/setLike-comments-use-case';
 
 @Controller('comments')
 export class CommentsController {
   constructor(
     private commandBus: CommandBus,
-    @Inject(CommentsQueryRepository)
-    private commentsQueryRepository: CommentsQueryRepository,
+    private queryBus: QueryBus,
   ) {}
 
   @UseGuards(BearerGuard)
@@ -42,7 +41,7 @@ export class CommentsController {
   ): Promise<void> {
     await this.commandBus.execute(
       new SetLikeCommentsCommand(commentId, likeStatus.likeStatus, req.user),
-    );
+    ); //
   }
 
   @UseGuards(BearerGuard)
@@ -53,13 +52,10 @@ export class CommentsController {
     @Param('id') commentId: string,
     @Body() content: ContentInputDto,
   ): Promise<void> {
-    const inputDto = {
-      commentId,
-      content: content.content,
-      userId: req.user.id,
-    };
-    await this.commandBus.execute(new UpdateCommentCommand(inputDto));
-  }
+    await this.commandBus.execute(
+      new UpdateCommentCommand(commentId, content.content, req.user.id),
+    );
+  } //
 
   @UseGuards(BearerGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -68,9 +64,9 @@ export class CommentsController {
     @Param('id') commentId: string,
     @Req() req: Request & { user: UserDocument },
   ): Promise<void> {
-    const userId = req.user?._id?.toString();
+    const userId = req.user?.id?.toString();
     return this.commandBus.execute(new DeleteCommentCommand(commentId, userId));
-  }
+  } //
 
   @UseGuards(OptionalBearerGuard)
   @HttpCode(HttpStatus.OK)
@@ -79,7 +75,7 @@ export class CommentsController {
     @Param('id') commentId: string,
     @Req() req: Request & { user: UserDocument },
   ): Promise<CommentViewType | null> {
-    const userId = req.user?._id?.toString();
-    return this.commentsQueryRepository.findCommentById(commentId, userId);
-  }
+    const userId = req.user?.id?.toString();
+    return this.queryBus.execute(new FindCommentByIdQuery(commentId, userId));
+  } //
 }

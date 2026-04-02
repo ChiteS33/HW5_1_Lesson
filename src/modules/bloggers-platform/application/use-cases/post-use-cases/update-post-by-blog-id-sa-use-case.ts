@@ -1,7 +1,7 @@
 import { Inject } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostService } from '../../posts.service';
-import { PostInputDto } from '../../../domain/entities/posts.entity';
+import { PostInputDtoValidation } from '../../../domain/entities/posts.entity';
 import { PostsRepository } from '../../../repositories/postsRepositories/posts.repository';
 import { BlogsService } from '../../blogs.service';
 
@@ -9,7 +9,7 @@ export class UpdatePostByBlogIdSaCommand {
   constructor(
     public blogId: string,
     public postId: string,
-    public postInputDto: PostInputDto,
+    public postInputDto: PostInputDtoValidation,
   ) {}
 }
 

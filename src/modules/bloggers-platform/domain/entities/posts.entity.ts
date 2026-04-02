@@ -1,25 +1,38 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { IsStringWithTrim } from '../../../../core/decorators/validation/is-string-with-trim';
+import { IsNotEmpty } from 'class-validator';
 
 export type PostDocument = HydratedDocument<PostModel>;
+export type PostInputDtoType = {
+  title: string;
+  shortDescription: string;
+  content: string;
+};
 
-export class PostInputDto {
+export class PostInputDtoValidation {
+  @IsNotEmpty()
   @IsStringWithTrim(1, 30)
   title: string;
+  @IsNotEmpty()
   @IsStringWithTrim(1, 100)
   shortDescription: string;
+  @IsNotEmpty()
   @IsStringWithTrim(1, 1000)
   content: string;
 }
 
-export class PostInputDtoForCreate {
+export class PostInputDtoValidationForCreate {
+  @IsNotEmpty()
   @IsStringWithTrim(1, 30)
   title: string;
+  @IsNotEmpty()
   @IsStringWithTrim(1, 100)
   shortDescription: string;
+  @IsNotEmpty()
   @IsStringWithTrim(1, 1000)
   content: string;
+  @IsNotEmpty()
   @IsStringWithTrim(1, 100)
   blogId: string;
 }
@@ -56,7 +69,7 @@ export class PostModel {
   @Prop({ type: Date, required: true }) createdAt: Date;
 
   public static createPost(
-    dto: PostInputDtoForCreate,
+    dto: PostInputDtoValidationForCreate,
     blogName: string,
   ): PostModel {
     const newPost = new PostModel();
@@ -70,7 +83,7 @@ export class PostModel {
     return newPost;
   }
 
-  updatePost(postInputDto: PostInputDtoForCreate) {
+  updatePost(postInputDto: PostInputDtoValidationForCreate) {
     this.title = postInputDto.title;
     this.shortDescription = postInputDto.shortDescription;
     this.content = postInputDto.content;
@@ -81,5 +94,5 @@ export class PostModel {
 export const PostSchema = SchemaFactory.createForClass(PostModel);
 PostSchema.loadClass(PostModel);
 export interface PostModelI extends Model<PostDocument> {
-  createPost(dto: PostInputDto, blogName: string): PostModel;
+  createPost(dto: PostInputDtoValidation, blogName: string): PostModel;
 }

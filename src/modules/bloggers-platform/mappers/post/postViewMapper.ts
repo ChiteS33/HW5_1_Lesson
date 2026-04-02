@@ -1,7 +1,9 @@
-import { PostEntityType } from '../../repositories/entity-types/postEntity.type';
-import { PostViewType } from '../../api/view-types/posts/postView.type';
+import { PostEntityWithLikeCounterType } from '../../repositories/entity-types/postEntity.type';
 
-export const postViewMapper = (post: PostEntityType): PostViewType => {
+export const postViewMapperWithCount = (
+  post: PostEntityWithLikeCounterType,
+  // myStatus: LikeDislikeStatus,
+): any => {
   return {
     id: post.id.toString(),
     title: post.title,
@@ -11,9 +13,9 @@ export const postViewMapper = (post: PostEntityType): PostViewType => {
     blogName: post.blogName,
     createdAt: post.createdAt.toISOString(),
     extendedLikesInfo: {
-      likesCount: 0,
-      dislikesCount: 0,
-      myStatus: 'None',
+      likesCount: post.likes_count,
+      dislikesCount: post.dislikes_count,
+      myStatus: 'Like',
       newestLikes: [],
     },
   };

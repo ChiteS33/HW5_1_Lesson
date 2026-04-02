@@ -28,7 +28,7 @@ export class DeleteAllController {
     // return { success: true };
 
     await this.datasource.query(
-      `TRUNCATE TABLE "Users", "Sessions", "Posts", "Blogs" RESTART IDENTITY`,
+      `TRUNCATE TABLE "Users", "Sessions", "Posts", "Blogs", "Comments", "LikesForComments", "LikesForPosts"  RESTART IDENTITY CASCADE`,
     );
   }
 }

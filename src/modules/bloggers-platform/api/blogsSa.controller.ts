@@ -15,7 +15,7 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { BasicAuthGuard } from '../../user-accounts/guards/basic/basic-auth-guard.service';
 import { BlogInputDto } from '../domain/entities/blogs.entity';
 import { CreateBlogSaCommand } from '../application/use-cases/blogSa-use-cases/create-blog-sa-use-case';
-import { PostInputDto } from '../domain/entities/posts.entity';
+import { PostInputDtoValidation } from '../domain/entities/posts.entity';
 import { UpdateBlogSaCommand } from '../application/use-cases/blogSa-use-cases/update-blog-sa-use-case';
 import { DeleteBlogSaCommand } from '../application/use-cases/blogSa-use-cases/delete-blog-sa-use-case';
 import { UpdatePostByBlogIdSaCommand } from '../application/use-cases/post-use-cases/update-post-by-blog-id-sa-use-case';
@@ -28,6 +28,8 @@ import { DeletePostByBlogIdSaCommand } from '../application/use-cases/blogSa-use
 import { FinalViewWithPaginationType } from '../../../core/types/finalViewWithPagination.type';
 import { BlogViewType } from './view-types/blogs/blogView.type';
 import { PostViewType } from './view-types/posts/postView.type';
+import { PostViewWithLikesType } from './view-types/posts/postViewWithLikes.type';
+import { FindPostByPostIdQuery } from '../application/query-handlers/post-query-handlers/get-postById-query-handler';
 
 @Controller('sa/blogs')
 export class BlogsControllerSa {
@@ -76,11 +78,12 @@ export class BlogsControllerSa {
   @Post(':id/posts')
   async createPostByBlogId(
     @Param('id') blogId: string,
-    @Body() postInputDto: PostInputDto,
-  ): Promise<PostViewType> {
-    return await this.commandBus.execute(
+    @Body() postInputDto: PostInputDtoValidation,
+  ): Promise<PostViewWithLikesType> {
+    const id: string = await this.commandBus.execute(
       new CreatePostByBlogIdSaCommand(blogId, postInputDto),
     );
+    return this.queryBus.execute(new FindPostByPostIdQuery(id));
   }
 
   @UseGuards(BasicAuthGuard)
@@ -99,7 +102,7 @@ export class BlogsControllerSa {
   async updatePostByBlogId(
     @Param('blogId') blogId: string,
     @Param('postId') postId: string,
-    @Body() postInputDto: PostInputDto,
+    @Body() postInputDto: PostInputDtoValidation,
   ): Promise<void> {
     await this.commandBus.execute(
       new UpdatePostByBlogIdSaCommand(blogId, postId, postInputDto),

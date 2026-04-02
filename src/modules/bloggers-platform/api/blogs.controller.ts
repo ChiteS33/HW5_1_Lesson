@@ -40,7 +40,7 @@ export class BlogsController {
     @Query() query: InputQueryPaginationTypeWithSearchName,
     @Req() req: Request & { user: UserDocument },
   ): Promise<FinalViewWithPaginationType<PostViewType>> {
-    const userId = req.user?._id?.toString();
+    const userId = req.user?.id?.toString();
     return await this.queryBus.execute(
       new GetAllPostsByBlogIdQuery(blogId, query, userId),
     );

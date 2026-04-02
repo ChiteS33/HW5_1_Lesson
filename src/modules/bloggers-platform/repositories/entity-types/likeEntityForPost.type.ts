@@ -1,9 +1,10 @@
 import { LikeDislikeStatus } from '../../domain/entities/posts.entity';
 
 export type LikeEntityForPostType = {
-  userId: string;
+  id: number;
+  userId: number;
   login: string;
-  postId: string;
+  postId: number;
   status: LikeDislikeStatus;
-  data: Date;
+  createdAt: Date;
 };

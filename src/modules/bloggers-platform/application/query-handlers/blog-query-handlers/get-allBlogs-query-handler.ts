@@ -15,6 +15,7 @@ export class GetAllBlogsQueryHandlers implements IQueryHandler<GetAllBlogsQuery>
     @Inject(BlogsQueryRepository)
     private blogsQueryRepository: BlogsQueryRepository,
   ) {}
+
   async execute(
     query: GetAllBlogsQuery,
   ): Promise<FinalViewWithPaginationType<BlogViewType>> {

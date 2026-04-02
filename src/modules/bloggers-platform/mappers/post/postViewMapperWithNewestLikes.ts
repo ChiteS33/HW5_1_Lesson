@@ -1,12 +1,12 @@
 import { PostViewWithLikesType } from '../../api/view-types/posts/postViewWithLikes.type';
-import { PostEntityType } from '../../repositories/entity-types/postEntity.type';
+import { PostEntityWithLikeCounterType } from '../../repositories/entity-types/postEntity.type';
+import { LikeEntityForPostType } from '../../repositories/entity-types/likeEntityForPost.type';
+import { LikeDislikeStatus } from '../../domain/entities/posts.entity';
 
 export const postViewMapperWithNewestLikes = (
-  post: PostEntityType,
-  totalCountLike: number,
-  totalCountDislike: number,
-  status: string,
-  // newestLikesForPost: LikeInDbForPost,
+  post: PostEntityWithLikeCounterType,
+  status: LikeDislikeStatus,
+  newestLikes: LikeEntityForPostType[],
 ): PostViewWithLikesType => {
   return {
     id: post.id.toString(),
@@ -17,15 +17,14 @@ export const postViewMapperWithNewestLikes = (
     blogName: post.blogName,
     createdAt: post.createdAt.toISOString(),
     extendedLikesInfo: {
-      likesCount: totalCountLike,
-      dislikesCount: totalCountDislike,
+      likesCount: post.likes_count,
+      dislikesCount: post.dislikes_count,
       myStatus: status,
-      // newestLikes: newestLikesForPost.map((like) => ({
-      //   addedAt: like.data.toISOString(),
-      //   userId: like.userId,
-      //   login: like.login,
-      newestLikes: [],
-      // })),
+      newestLikes: newestLikes.map((like) => ({
+        addedAt: like.createdAt.toISOString(),
+        userId: like.userId.toString(),
+        login: like.login,
+      })),
     },
   };
 };

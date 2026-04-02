@@ -3,7 +3,7 @@ import { SortDirection } from '../types/enumSortDirection.type';
 
 export const paginationValuesMakerMapper = (
   pagination: InputQueryPaginationTypeWithSearchName,
-) => {
+): paginationValuesForRepo => {
   return {
     pageNumber: pagination.pageNumber ? Number(pagination.pageNumber) : 1,
     pageSize: pagination.pageSize ? Number(pagination.pageSize) : 10,
@@ -12,4 +12,11 @@ export const paginationValuesMakerMapper = (
       ? pagination.sortDirection
       : SortDirection.DESC,
   };
+};
+
+export type paginationValuesForRepo = {
+  pageNumber: number;
+  pageSize: number;
+  sortBy: string;
+  sortDirection: SortDirection;
 };

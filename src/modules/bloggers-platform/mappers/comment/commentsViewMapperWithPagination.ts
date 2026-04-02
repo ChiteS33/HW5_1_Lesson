@@ -1,11 +1,11 @@
 import { PaginationViewType } from '../../../../core/types/paginationViewType';
 import { FinalViewWithPaginationType } from '../../../../core/types/finalViewWithPagination.type';
-import { CommentViewType } from '../../api/view-types/comments/commentView.type';
+import { LikeEntityForCommentWithLikeStatusType } from '../../repositories/entity-types/likeEntityForComment.type';
 
 export const commentsViewMapperWithPagination = (
-  comment: CommentViewType[],
+  comment: any[],
   pagination: PaginationViewType,
-): FinalViewWithPaginationType<CommentViewType> => {
+): FinalViewWithPaginationType<LikeEntityForCommentWithLikeStatusType> => {
   return {
     pagesCount: pagination.pagesCount,
     page: pagination.page,

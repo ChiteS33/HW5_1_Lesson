@@ -1,21 +1,22 @@
 import { LikeDislikeStatus } from '../../domain/entities/posts.entity';
-import { CommentDocument } from '../../domain/entities/comments.entity';
 import { CommentViewType } from '../../api/view-types/comments/commentView.type';
+import { CommentEntityWithLikeCounterType } from '../../repositories/entity-types/commentEntityWithLikeStatus.type';
 
 export const commentsViewMapperWithCount = (
-  comment: CommentDocument,
-  like: number,
-  dislike: number,
+  comment: CommentEntityWithLikeCounterType,
   myStatus: LikeDislikeStatus,
 ): CommentViewType => {
   return {
-    id: comment._id.toString(),
+    id: comment.id.toString(),
     content: comment.content,
-    commentatorInfo: comment.commentatorInfo,
+    commentatorInfo: {
+      userId: comment.userId.toString(),
+      userLogin: comment.userLogin,
+    },
     createdAt: comment.createdAt,
     likesInfo: {
-      likesCount: like,
-      dislikesCount: dislike,
+      likesCount: comment.likes_count,
+      dislikesCount: comment.dislikes_count,
       myStatus: myStatus,
     },
   };

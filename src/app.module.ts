@@ -1,3 +1,4 @@
+import { configModule } from './config-dynamic-module';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
@@ -9,6 +10,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { BlogsModule } from './modules/bloggers-platform/bloggers-platform.module';
 import { AllHttpExceptionsFilter } from './core/exceptions/filters/all-exceptions.filter';
 import { DomainHttpExceptionsFilter } from './core/exceptions/filters/domain-exceptions.filter';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 const errorFilters = [
   {
@@ -23,17 +25,24 @@ const errorFilters = [
 
 @Module({
   imports: [
+    configModule,
     CqrsModule,
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'postgres',
-      database: 'postgres',
-      autoLoadEntities: false,
-      synchronize: false,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get('POSTGRES_HOST'),
+        port: configService.get('POSTGRES_PORT'),
+        username: configService.get('POSTGRES_USERNAME'),
+        password: configService.get('POSTGRES_PASSWORD'),
+        database: configService.get('POSTGRES_DATABASE'),
+        autoLoadEntities: true,
+        synchronize: true,
+      }),
+
+      inject: [ConfigService],
     }),
+    // TypeOrmModule.forFeature([User]),
     PassportModule,
     MongooseModule.forRoot('mongodb://localhost:27017/Grecha'),
     ThrottlerModule.forRoot([
